@@ -37,6 +37,13 @@ class TestCase extends HashSet<Param> {
         this.boundParams = boundParams;
     }
 
+    public TestCase(final UnboundParam[] unboundParams,
+            final BoundParam[][] boundParams) {
+        super();
+        this.unboundParams = unboundParams;
+        this.boundParams = boundParams;
+    }
+    
     public TestCase createUnbound(final int i) {
         final boolean[] missing = new boolean[i + 1];
         for (final Param param : this) {

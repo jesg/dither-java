@@ -35,9 +35,11 @@ class IPOG {
     private final int t;
     private final BoundParam[][] boundParams;
     private final Object[][] inputParams;
-    private final Map<Integer, Integer> origIndex;
+    private final Map<Integer, Integer> origIndex = new HashMap<Integer, Integer>();
+    private final Map<Integer, Integer> inverseOrigIndex = new HashMap<Integer, Integer>();
+    private final List<TestCase> constraints;
 
-    public IPOG(final Object[][] input, final int t) {
+    public IPOG(final Object[][] input, final int t, final Integer[][] constraints) {
         this.t = t;
         this.inputParams = input;
 
@@ -47,16 +49,27 @@ class IPOG {
             tmp[k] = new IndexArrayPair(k, input[k]);
         }
         Arrays.sort(tmp, new ArrayLengthComparator());
-        this.origIndex = new HashMap<Integer, Integer>();
         this.unboundParams = new UnboundParam[tmp.length];
         this.boundParams = new BoundParam[tmp.length][];
         for (int k = 0; k < tmp.length; k++) {
             this.origIndex.put(k, tmp[k].getI());
+            this.inverseOrigIndex.put(tmp[k].getI(), k);
             this.unboundParams[k] = new UnboundParam(k);
             this.boundParams[k] = new BoundParam[tmp[k].getArr().length];
 
             for (int h = 0; h < this.boundParams[k].length; h++) {
                 this.boundParams[k][h] = new BoundParam(k, h);
+            }
+        }
+        
+        // setup constraints
+        this.constraints = new ArrayList<TestCase>(constraints.length);
+        for (final Integer[] constraint : constraints ) {
+            final TestCase testCase = new TestCase(unboundParams, boundParams);
+            for(int k = 0; k < constraint.length; k++ ) {
+                if(constraint[k] != null) {
+                    testCase.add(boundParams[inverseOrigIndex.get(k)][constraint[k]]);
+                }
             }
         }
 
