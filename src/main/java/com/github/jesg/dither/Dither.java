@@ -22,8 +22,18 @@ package com.github.jesg.dither;
 
 public class Dither {
 
+    public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints)
+            throws DitherError {
+        return new IPOG(params, t, constraints).run();
+    }
+    
     public static Object[][] ipog(final int t, final Object[][] params)
             throws DitherError {
-        return new IPOG(params, t).run();
+        return new IPOG(params, t, new Integer[][]{}).run();
+    }
+    
+    public static Object[][] ipog(final Object[][] params)
+            throws DitherError {
+        return new IPOG(params, 2, new Integer[][]{}).run();
     }
 }
