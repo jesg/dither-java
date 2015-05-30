@@ -79,10 +79,10 @@ public class IPOGTest {
 
     @Test
     public void canGen3WayCases() {
-        IPOG ipog = new IPOG(new Object[][] { new Object[] { 1, 2 },
-                new Object[] { "1", "2" }, // this and the next one not covered
-                new Object[] { 1.0, 2.0 }, new Object[] { true, false, 3 } }, 3);
+        Object[][] results = Dither.ipog(3, new Object[][] { new Object[] { 1, 2 },
+                new Object[] { "1", "2" },
+                new Object[] { 1.0, 2.0 }, new Object[] { true, false, 3 } });
 
-        assertTrue(ipog.run().length == 12);
+        assertTrue(results.length == 12);
     }
 }
