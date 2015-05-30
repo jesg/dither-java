@@ -40,10 +40,12 @@ public class TestCaseTest {
     private static final BoundParam[][] boundParams = new BoundParam[][] {
             new BoundParam[] { new BoundParam(0, 0), new BoundParam(0, 1) },
             new BoundParam[] { new BoundParam(1, 0), new BoundParam(1, 1) } };
+    
+    private static final TestCase[] EMPTY_CONSTRAINTS = new TestCase[]{};
 
     @Test
     public void testCreateUnboundDoesNotOverrideBoundParams() {
-        TestCase testCase = new TestCase(unboundParams, null,
+        TestCase testCase = new TestCase(unboundParams, null, EMPTY_CONSTRAINTS,
                 Arrays.asList(new BoundParam(0, 1)));
         TestCase fillWithUnbound = testCase.createUnbound(1);
         assertFalse(fillWithUnbound.contains(unboundParams[0]));
@@ -51,7 +53,7 @@ public class TestCaseTest {
 
     @Test
     public void testCreateUnboundAddsUnboundParams() {
-        TestCase testCase = new TestCase(unboundParams, null,
+        TestCase testCase = new TestCase(unboundParams, null, EMPTY_CONSTRAINTS,
                 Arrays.asList(new BoundParam(0, 1)));
         TestCase fillWithUnbound = testCase.createUnbound(2);
         assertFalse(fillWithUnbound.contains(unboundParams[1]));
@@ -59,7 +61,7 @@ public class TestCaseTest {
 
     @Test
     public void canCreateIpogArray() {
-        TestCase testCase = new TestCase(unboundParams, null,
+        TestCase testCase = new TestCase(unboundParams, null, EMPTY_CONSTRAINTS,
                 Arrays.asList(new BoundParam(0, 1)));
         int[] ipogArray = testCase.toIpogArray(3);
         assertArrayEquals(new int[] { 1, -1, -1 }, ipogArray);
@@ -67,9 +69,9 @@ public class TestCaseTest {
 
     @Test
     public void canNotMergeIfConflict() {
-        TestCase testCase1 = new TestCase(unboundParams, boundParams,
+        TestCase testCase1 = new TestCase(unboundParams, boundParams, EMPTY_CONSTRAINTS,
                 Arrays.asList(new BoundParam(0, 1)));
-        TestCase testCase2 = new TestCase(unboundParams, boundParams,
+        TestCase testCase2 = new TestCase(unboundParams, boundParams, EMPTY_CONSTRAINTS,
                 Arrays.asList(new BoundParam(0, 0)));
         TestCase testCase1Merge = testCase1.mergeWithoutConflict(1, testCase2);
         assertNull(testCase1Merge);
@@ -79,9 +81,9 @@ public class TestCaseTest {
 
     @Test
     public void canMergeIfSame() {
-        TestCase testCase1 = new TestCase(unboundParams, boundParams,
+        TestCase testCase1 = new TestCase(unboundParams, boundParams, EMPTY_CONSTRAINTS,
                 Arrays.asList(new BoundParam(0, 1)));
-        TestCase testCase2 = new TestCase(unboundParams, boundParams,
+        TestCase testCase2 = new TestCase(unboundParams, boundParams, EMPTY_CONSTRAINTS,
                 Arrays.asList(new BoundParam(0, 1)));
         TestCase testCase1Merge = testCase1.mergeWithoutConflict(2, testCase2);
         assertNotNull(testCase1Merge);
@@ -91,10 +93,10 @@ public class TestCaseTest {
 
     @Test
     public void canMergeIfFirstNull() {
-        TestCase testCase1 = new TestCase(unboundParams, boundParams,
-                Arrays.asList(new BoundParam(0, 1)));
-        TestCase testCase2 = new TestCase(unboundParams, boundParams,
-                Arrays.asList(new BoundParam(0, 1), new BoundParam(1, 0)));
+        TestCase testCase1 = new TestCase(unboundParams, boundParams);
+        testCase1.addAll(Arrays.asList(new BoundParam(0, 1)));
+        TestCase testCase2 = new TestCase(unboundParams, boundParams);
+        testCase2.addAll(Arrays.asList(new BoundParam(0, 1), new BoundParam(1, 0)));
         TestCase testCase1Merge = testCase1.mergeWithoutConflict(1, testCase2);
         assertNotNull(testCase1Merge);
         assertTrue(testCase1.contains(new BoundParam(0, 1)));

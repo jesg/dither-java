@@ -26,17 +26,38 @@ import java.util.HashSet;
 
 class TestCase extends HashSet<Param> {
 
+    private static final TestCase[] EMPTY_CONSTRAINTS = new TestCase[]{};
+    
     private final UnboundParam[] unboundParams;
     private final BoundParam[][] boundParams;
+    private final TestCase[] constraints;
 
     public TestCase(final UnboundParam[] unboundParams,
             final BoundParam[][] boundParams,
-            final Collection<BoundParam> params) {
+            final TestCase[] constraints, final Collection<? extends Param> params) {
         super(params);
         this.unboundParams = unboundParams;
         this.boundParams = boundParams;
+        this.constraints = constraints;
     }
-
+    
+    public TestCase(final UnboundParam[] unboundParams,
+            final BoundParam[][] boundParams,
+            final TestCase[] constraints) {
+        super();
+        this.unboundParams = unboundParams;
+        this.boundParams = boundParams;
+        this.constraints = constraints;
+    }
+    
+    public TestCase(final UnboundParam[] unboundParams,
+            final BoundParam[][] boundParams) {
+        super();
+        this.unboundParams = unboundParams;
+        this.boundParams = boundParams;
+        this.constraints = EMPTY_CONSTRAINTS;
+    }
+    
     public TestCase createUnbound(final int i) {
         final boolean[] missing = new boolean[i + 1];
         for (final Param param : this) {
@@ -60,6 +81,17 @@ class TestCase extends HashSet<Param> {
             }
             final BoundParam boundParam = (BoundParam) param;
             result[boundParam.i()] = boundParam.j();
+        }
+        return result;
+    }
+    
+    public boolean hasAnyConstraint() {
+        boolean result = false;
+        for (final TestCase constraint : constraints) {
+            if (containsAll(constraint)) {
+                result = true;
+                break;
+            }
         }
         return result;
     }
@@ -87,6 +119,19 @@ class TestCase extends HashSet<Param> {
             }
         }
 
+        // shallow clone
+        final TestCase thisClone = new TestCase(unboundParams, boundParams, constraints, this);
+        for (final Param param : newElements) {
+            if (param == null) {
+                break;
+            }
+            thisClone.add(param);
+        }
+        
+        if(thisClone.hasAnyConstraint()) {
+            return null;
+        }
+        
         // commit merge
         for (final Param param : newElements) {
             if (param == null) {

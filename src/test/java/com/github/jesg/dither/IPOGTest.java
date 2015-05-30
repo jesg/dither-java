@@ -20,10 +20,12 @@ package com.github.jesg.dither;
  * #L%
  */
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -79,10 +81,80 @@ public class IPOGTest {
 
     @Test
     public void canGen3WayCases() {
-        IPOG ipog = new IPOG(new Object[][] { new Object[] { 1, 2 },
-                new Object[] { "1", "2" }, // this and the next one not covered
-                new Object[] { 1.0, 2.0 }, new Object[] { true, false, 3 } }, 3);
+        Object[][] results = Dither.ipog(3, new Object[][] { new Object[] { 1, 2 },
+                new Object[] { "1", "2" },
+                new Object[] { 1.0, 2.0 }, new Object[] { true, false, 3 } });
 
-        assertTrue(ipog.run().length == 12);
+        assertTrue(results.length == 12);
+    }
+    
+    @Test
+    public void canCompute3WayIPOGWithConstraints() {
+        Object[][] results = Dither.ipog(3, new Object[][] { new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1, 2, 3 }},
+                new Integer[][]{ new Integer[]{0, null, 2}, new Integer[]{0, 1, 0}});
+        
+        Set<List<Object>> actuals = new HashSet<List<Object>>();
+        for(Object[] result : results) {
+            actuals.add(Arrays.asList(result));
+        }
+
+        List<List<Integer>> expected = Arrays.asList(
+                Arrays.asList(0, 0, 0),
+                Arrays.asList(1, 0, 0),
+                Arrays.asList(1, 1, 0),
+                Arrays.asList(0, 0, 1),
+                Arrays.asList(1, 0, 1),
+                Arrays.asList(0, 1, 1),
+                Arrays.asList(1, 1, 1),
+                Arrays.asList(1, 0, 2),
+                Arrays.asList(1, 1, 2),
+                Arrays.asList(0, 0, 3),
+                Arrays.asList(1, 0, 3),
+                Arrays.asList(0, 1, 3),
+                Arrays.asList(1, 1, 3));
+
+        for(List expectedResult : expected) {
+            assertTrue("expected " + expectedResult, actuals.contains(expectedResult));
+        }
+    }
+    
+    @Test
+    public void anotherCompute3WayIPOGWithConstraints() {
+        Object[][] results = Dither.ipog(3, new Object[][] { new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1, 2, 3 }},
+                new Integer[][]{ new Integer[]{0, 1, 0}});
+        
+        Set<List<Object>> actuals = new HashSet<List<Object>>();
+        for(Object[] result : results) {
+            actuals.add(Arrays.asList(result));
+        }
+        
+        List<List<Integer>> expected = Arrays.asList(
+                Arrays.asList(0, 0, 0, 0),
+                Arrays.asList(1, 1, 0, 0),
+                Arrays.asList(1, 0, 1, 0),
+                Arrays.asList(0, 1, 1, 0),
+                Arrays.asList(1, 0, 0, 1),
+                Arrays.asList(1, 1, 0, 1),
+                Arrays.asList(0, 0, 1, 1),
+                Arrays.asList(1, 1, 1, 1),
+                Arrays.asList(0, 0, 0, 2),
+                Arrays.asList(1, 1, 0, 2),
+                Arrays.asList(1, 0, 1, 2),
+                Arrays.asList(0, 1, 1, 2),
+                Arrays.asList(0, 0, 0, 3),
+                Arrays.asList(1, 1, 0, 3),
+                Arrays.asList(1, 0, 1, 3),
+                Arrays.asList(0, 1, 1, 3),
+                Arrays.asList(0, 0, 0, 1),
+                Arrays.asList(0, 1, 1, 1));
+        
+        for(List expectedResult : expected) {
+            assertTrue("expected " + expectedResult, actuals.contains(expectedResult));
+        }
     }
 }
