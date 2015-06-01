@@ -1,5 +1,7 @@
 package com.github.jesg.dither;
 
+import java.util.List;
+
 /*
  * #%L
  * dither
@@ -35,5 +37,20 @@ public class Dither {
     public static Object[][] ipog(final Object[][] params)
             throws DitherError {
         return new IPOG(params, 2, new Integer[][]{}).run();
+    }
+    
+    public static Object[][] ipog(final int t, final Object[] params, final Object[] constraints)
+            throws DitherError {
+        final Object[][] innerParams = new Object[params.length][];
+        for(int i = 0; i < innerParams.length; i++) {
+            innerParams[i] = (Object[]) params[i];
+        }
+        
+        final Integer[][] innerConstraints = new Integer[constraints.length][];
+        for(int i = 0; i < innerConstraints.length; i++) {
+            innerConstraints[i] = (Integer[]) constraints[i];
+        }
+        
+        return new IPOG(innerParams, t, innerConstraints).run();
     }
 }
