@@ -9,9 +9,9 @@ package com.github.jesg.dither;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -86,15 +86,31 @@ public class IPOGTest {
                 new Object[] { 1.0, 2.0 }, new Object[] { true, false, 3 } });
 
         assertTrue(results.length == 12);
+
+
+        results = Dither.ipog(3, new Object[][] {
+                new Object[] { 1, 2 },
+                new Object[] { 1, 2 },
+                new Object[] { 1, 2 },
+                new Object[] { 1, 2 },
+                new Object[] { 1, 2, 3 },
+                new Object[] { 1, 2, 3 },
+                new Object[] { 1, 2, 3 },
+                new Object[] { 1, 2, 3, 4 },
+                new Object[] { 1, 2, 3, 4, 5, 6 },
+                new Object[] { 1, 2, 3, 4, 5, 6 }});
+        System.out.println(results.length);
+        // 5 => 1689  in 15 sec .. vs 11 min in ruby
+        // 6 => 4483 in 134.3 sec 2.2 minutes
     }
-    
+
     @Test
     public void canCompute3WayIPOGWithConstraints() {
         Object[][] results = Dither.ipog(3, new Object[][] { new Object[] { 0, 1 },
                 new Object[] { 0, 1 },
                 new Object[] { 0, 1, 2, 3 }},
                 new Integer[][]{ new Integer[]{0, null, 2}, new Integer[]{0, 1, 0}});
-        
+
         Set<List<Object>> actuals = new HashSet<List<Object>>();
         for(Object[] result : results) {
             actuals.add(Arrays.asList(result));
@@ -119,7 +135,7 @@ public class IPOGTest {
             assertTrue("expected " + expectedResult, actuals.contains(expectedResult));
         }
     }
-    
+
     @Test
     public void anotherCompute3WayIPOGWithConstraints() {
         Object[][] results = Dither.ipog(3, new Object[][] { new Object[] { 0, 1 },
@@ -127,12 +143,12 @@ public class IPOGTest {
                 new Object[] { 0, 1 },
                 new Object[] { 0, 1, 2, 3 }},
                 new Integer[][]{ new Integer[]{0, 1, 0}});
-        
+
         Set<List<Object>> actuals = new HashSet<List<Object>>();
         for(Object[] result : results) {
             actuals.add(Arrays.asList(result));
         }
-        
+
         List<List<Integer>> expected = Arrays.asList(
                 Arrays.asList(0, 0, 0, 0),
                 Arrays.asList(1, 1, 0, 0),
@@ -152,7 +168,7 @@ public class IPOGTest {
                 Arrays.asList(0, 1, 1, 3),
                 Arrays.asList(0, 0, 0, 1),
                 Arrays.asList(0, 1, 1, 1));
-        
+
         for(List expectedResult : expected) {
             assertTrue("expected " + expectedResult, actuals.contains(expectedResult));
         }

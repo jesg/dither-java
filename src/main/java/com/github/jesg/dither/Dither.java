@@ -11,9 +11,9 @@ import java.util.List;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -28,29 +28,29 @@ public class Dither {
             throws DitherError {
         return new IPOG(params, t, constraints).run();
     }
-    
+
     public static Object[][] ipog(final int t, final Object[][] params)
             throws DitherError {
         return new IPOG(params, t, new Integer[][]{}).run();
     }
-    
+
     public static Object[][] ipog(final Object[][] params)
             throws DitherError {
         return new IPOG(params, 2, new Integer[][]{}).run();
     }
-    
+
     public static Object[][] ipog(final int t, final Object[] params, final Object[] constraints)
             throws DitherError {
         final Object[][] innerParams = new Object[params.length][];
         for(int i = 0; i < innerParams.length; i++) {
             innerParams[i] = (Object[]) params[i];
         }
-        
+
         final Integer[][] innerConstraints = new Integer[constraints.length][];
         for(int i = 0; i < innerConstraints.length; i++) {
             innerConstraints[i] = (Integer[]) constraints[i];
         }
-        
+
         return new IPOG(innerParams, t, innerConstraints).run();
     }
 }

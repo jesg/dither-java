@@ -9,9 +9,9 @@ package com.github.jesg.dither;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -42,7 +42,7 @@ class IPOG {
     public IPOG(final Object[][] input, final int t) {
         this(input, t, new Integer[][]{});
     }
-    
+
     public IPOG(final Object[][] input, final int t, final Integer[][] constraints) {
         this.t = t;
         this.inputParams = input;
@@ -65,14 +65,14 @@ class IPOG {
                 this.boundParams[k][h] = new BoundParam(k, h);
             }
         }
-        
+
         // setup constraints
         this.constraints = new TestCase[constraints.length];
         for (int i = 0; i < constraints.length; i++) {
             final Integer[] constraint = constraints[i];
             final TestCase testCase = new TestCase(unboundParams, boundParams);
             this.constraints[i] = testCase;
-            
+
             for(int k = 0; k < constraint.length; k++ ) {
                 if(constraint[k] != null) {
                     testCase.add(boundParams[inverseOrigIndex.get(k)][constraint[k]]);
@@ -234,12 +234,12 @@ class IPOG {
         }
 
         TestCase innerTestCase = testCase;
-        
+
         for(int k = 0; k < result.length; k++) {
             if(result[k] != null) {
                 continue;
             }
-            
+
             final Object[] origParams = inputParams[k];
             for(int h = 0; h < origParams.length; h++) {
                 final BoundParam innerParam = boundParams[inverseOrigIndex.get(k)][h];
@@ -256,7 +256,7 @@ class IPOG {
                 return null;
             }
         }
-        
+
         if(innerTestCase.hasAnyConstraint()) {
             return null;
         }
@@ -295,7 +295,7 @@ class IPOG {
         if(testCase.hasAnyConstraint()) {
             return null;
         }
-        
+
         testCase.add(boundParams[i][currentJ]);
         return currentMatches;
     }

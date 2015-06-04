@@ -9,9 +9,9 @@ package com.github.jesg.dither;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -27,7 +27,7 @@ import java.util.HashSet;
 class TestCase extends HashSet<Param> {
 
     private static final TestCase[] EMPTY_CONSTRAINTS = new TestCase[]{};
-    
+
     private final UnboundParam[] unboundParams;
     private final BoundParam[][] boundParams;
     private final TestCase[] constraints;
@@ -40,7 +40,7 @@ class TestCase extends HashSet<Param> {
         this.boundParams = boundParams;
         this.constraints = constraints;
     }
-    
+
     public TestCase(final UnboundParam[] unboundParams,
             final BoundParam[][] boundParams,
             final TestCase[] constraints) {
@@ -49,7 +49,7 @@ class TestCase extends HashSet<Param> {
         this.boundParams = boundParams;
         this.constraints = constraints;
     }
-    
+
     public TestCase(final UnboundParam[] unboundParams,
             final BoundParam[][] boundParams) {
         super();
@@ -57,7 +57,7 @@ class TestCase extends HashSet<Param> {
         this.boundParams = boundParams;
         this.constraints = EMPTY_CONSTRAINTS;
     }
-    
+
     public TestCase createUnbound(final int i) {
         final boolean[] missing = new boolean[i + 1];
         for (final Param param : this) {
@@ -84,7 +84,7 @@ class TestCase extends HashSet<Param> {
         }
         return result;
     }
-    
+
     public boolean hasAnyConstraint() {
         boolean result = false;
         for (final TestCase constraint : constraints) {
@@ -127,11 +127,11 @@ class TestCase extends HashSet<Param> {
             }
             thisClone.add(param);
         }
-        
+
         if(thisClone.hasAnyConstraint()) {
             return null;
         }
-        
+
         // commit merge
         for (final Param param : newElements) {
             if (param == null) {
