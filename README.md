@@ -27,7 +27,7 @@ Object[][] results3constraints = Dither.ipog(3, new Object[][] {
         new Object[] { true, false },
         new Object[] { "cat", "dog", "bird" }},
         new Integer[][]{  // constraints
-			new Integer[]{null, null, 0, 1}}); // exclude true cat combination
+			new Integer[]{null, null, 0, 1}}); // exclude true dog combination
 ```
 
 # Note on Patches/Pull Requests
@@ -36,7 +36,7 @@ Object[][] results3constraints = Dither.ipog(3, new Object[][] {
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
   future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
+* Commit, do not mess with pom.xml, version, or history.
   (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches
 
