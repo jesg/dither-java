@@ -1,10 +1,24 @@
 # Dither
 An implementation of t-way test case generation with IPOG (In-Parameter-Order-General).
 
+# Maven
+
+Dither is in the Maven Central Repository.
+```xml
+<dependency>
+	<groupId>com.github.jesg</groupId>
+	<artifactId>dither</artifactId>
+	<version>0.0.1</version>
+	<scope>test</scope>
+</dependency>
+```
+
 # Usage
 
 ```java
 import com.github.jesg.dither.Dither;
+
+...
 
 // 2-way IPOG
 Object[][] results2 = Dither.ipog(new Object[][] {
@@ -28,6 +42,7 @@ Object[][] results3constraints = Dither.ipog(3, new Object[][] {
         new Object[] { "cat", "dog", "bird" }},
         new Integer[][]{  // constraints
 			new Integer[]{null, null, 0, 1}}); // exclude true dog combination
+...
 ```
 
 # Note on Patches/Pull Requests
