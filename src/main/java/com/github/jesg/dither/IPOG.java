@@ -37,7 +37,6 @@ class IPOG {
     private final Object[][] inputParams;
     private final Map<Integer, Integer> origIndex = new HashMap<Integer, Integer>();
     private final Map<Integer, Integer> inverseOrigIndex = new HashMap<Integer, Integer>();
-    private final Map<Integer, Map<Object, BoundParam>> origParamMap = new HashMap<Integer, Map<Object, BoundParam>>();
     private final TestCase[] constraints;
     private final Collection<Collection<BoundParam>> tested;
 
@@ -57,6 +56,7 @@ class IPOG {
             tmp[k] = new IndexArrayPair(k, input[k]);
         }
         Arrays.sort(tmp, new ArrayLengthComparator());
+        final Map<Integer, Map<Object, BoundParam>> origParamMap = new HashMap<Integer, Map<Object, BoundParam>>();
         this.unboundParams = new UnboundParam[tmp.length];
         this.boundParams = new BoundParam[tmp.length][];
         for (int k = 0; k < tmp.length; k++) {
@@ -65,11 +65,11 @@ class IPOG {
             this.unboundParams[k] = new UnboundParam(k);
             this.boundParams[k] = new BoundParam[tmp[k].getArr().length];
 
-            this.origParamMap.put(tmp[k].getI(),
+            origParamMap.put(tmp[k].getI(),
                     new HashMap<Object, BoundParam>());
             for (int h = 0; h < this.boundParams[k].length; h++) {
                 this.boundParams[k][h] = new BoundParam(k, h);
-                this.origParamMap.get(tmp[k].getI()).put(tmp[k].getArr()[h],
+                origParamMap.get(tmp[k].getI()).put(tmp[k].getArr()[h],
                         this.boundParams[k][h]);
             }
         }
@@ -78,7 +78,7 @@ class IPOG {
             final Collection<BoundParam> newCase = new ArrayList<BoundParam>(
                     innerTestCase.length);
             for (int k = 0; k < innerTestCase.length; k++) {
-                newCase.add(this.origParamMap.get(k).get(innerTestCase[k]));
+                newCase.add(origParamMap.get(k).get(innerTestCase[k]));
             }
             this.tested.add(newCase);
         }
