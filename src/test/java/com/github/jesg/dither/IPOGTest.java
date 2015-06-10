@@ -94,7 +94,7 @@ public class IPOGTest {
                 new Object[] { 0, 1 },
                 new Object[] { 0, 1, 2, 3 }},
                 new Integer[][]{ new Integer[]{0, null, 2}, new Integer[]{0, 1, 0}},
-                new Object[]{new Object[]{0, 0, 0}}
+                new Object[][]{new Object[]{0, 0, 0}}
         );
 
         Set<List<Object>> actuals = new HashSet<List<Object>>();
