@@ -86,30 +86,16 @@ public class IPOGTest {
                 new Object[] { 1.0, 2.0 }, new Object[] { true, false, 3 } });
 
         assertTrue(results.length == 12);
-
-
-        results = Dither.ipog(3, new Object[][] {
-                new Object[] { 1, 2 },
-                new Object[] { 1, 2 },
-                new Object[] { 1, 2 },
-                new Object[] { 1, 2 },
-                new Object[] { 1, 2, 3 },
-                new Object[] { 1, 2, 3 },
-                new Object[] { 1, 2, 3 },
-                new Object[] { 1, 2, 3, 4 },
-                new Object[] { 1, 2, 3, 4, 5, 6 },
-                new Object[] { 1, 2, 3, 4, 5, 6 }});
-        System.out.println(results.length);
-        // 5 => 1689  in 15 sec .. vs 11 min in ruby
-        // 6 => 4483 in 134.3 sec 2.2 minutes
     }
 
     @Test
-    public void canCompute3WayIPOGWithConstraints() {
+    public void canCompute3WayIPOGWithConstraintsAndPreviouslyTested() {
         Object[][] results = Dither.ipog(3, new Object[][] { new Object[] { 0, 1 },
                 new Object[] { 0, 1 },
                 new Object[] { 0, 1, 2, 3 }},
-                new Integer[][]{ new Integer[]{0, null, 2}, new Integer[]{0, 1, 0}});
+                new Integer[][]{ new Integer[]{0, null, 2}, new Integer[]{0, 1, 0}},
+                new Object[]{new Object[]{0, 0, 0}}
+        );
 
         Set<List<Object>> actuals = new HashSet<List<Object>>();
         for(Object[] result : results) {
@@ -117,7 +103,6 @@ public class IPOGTest {
         }
 
         List<List<Integer>> expected = Arrays.asList(
-                Arrays.asList(0, 0, 0),
                 Arrays.asList(1, 0, 0),
                 Arrays.asList(1, 1, 0),
                 Arrays.asList(0, 0, 1),

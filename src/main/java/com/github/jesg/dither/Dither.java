@@ -23,23 +23,31 @@ import java.util.List;
  */
 
 public class Dither {
+    
+    private static final Integer[][] EMPTY_CONSTRAINTS = new Integer[][]{};
+    private static final Object[][] EMPTY_PREVIOUSLY_TESTED = new Object[][]{};
 
+    public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
+            throws DitherError {
+        return new IPOG(params, t, constraints, previouslyTested).run();
+    }
+    
     public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints)
             throws DitherError {
-        return new IPOG(params, t, constraints).run();
+        return new IPOG(params, t, constraints, EMPTY_PREVIOUSLY_TESTED).run();
     }
 
     public static Object[][] ipog(final int t, final Object[][] params)
             throws DitherError {
-        return new IPOG(params, t, new Integer[][]{}).run();
+        return new IPOG(params, t, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED).run();
     }
 
     public static Object[][] ipog(final Object[][] params)
             throws DitherError {
-        return new IPOG(params, 2, new Integer[][]{}).run();
+        return new IPOG(params, 2, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED).run();
     }
 
-    public static Object[][] ipog(final int t, final Object[] params, final Object[] constraints)
+    public static Object[][] ipog(final int t, final Object[] params, final Object[] constraints, final Object[] previouslyTested)
             throws DitherError {
         final Object[][] innerParams = new Object[params.length][];
         for(int i = 0; i < innerParams.length; i++) {
@@ -51,6 +59,11 @@ public class Dither {
             innerConstraints[i] = (Integer[]) constraints[i];
         }
 
-        return new IPOG(innerParams, t, innerConstraints).run();
+        final Object[][] innerPerviouslyTested = new Object[previouslyTested.length][];
+        for(int i = 0; i < innerPerviouslyTested.length; i++) {
+            innerPerviouslyTested[i] = (Object[]) previouslyTested[i];
+        }
+        
+        return new IPOG(innerParams, t, innerConstraints, innerPerviouslyTested).run();
     }
 }
