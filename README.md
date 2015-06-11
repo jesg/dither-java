@@ -34,14 +34,15 @@ Object[][] results3 = Dither.ipog(3, new Object[][] {
         new Object[] { true, false },
         new Object[] { "cat", "dog", "bird" }});
 
-// 3-way IPOG with constraints
+// 3-way IPOG with constraints and exclude previously tested cases
 Object[][] results3constraints = Dither.ipog(3, new Object[][] {
 		new Object[] { 0, 1 },
         new Object[] { 0, 1 },
         new Object[] { true, false },
         new Object[] { "cat", "dog", "bird" }},
         new Integer[][]{  // constraints
-			new Integer[]{null, null, 0, 1}}); // exclude true dog combination
+			new Integer[]{null, null, 0, 1}}, // exclude true dog combination
+		new Object[][]{new Object[]{ 0, 0, true, "cat" }});  // previously tested cases
 ...
 ```
 
