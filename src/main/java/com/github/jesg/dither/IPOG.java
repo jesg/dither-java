@@ -128,7 +128,9 @@ class IPOG {
             for (int i = 0; i < innerArr.length; i++) {
                 testCase.add(boundParams[i][innerArr[i]]);
             }
-            testCases.add(testCase);
+            if (!hasTested(testCase)) {
+                testCases.add(testCase);
+            }
         }
 
         return testCases;
