@@ -38,14 +38,17 @@ class IPOG {
     private final Map<Integer, Integer> origIndex = new HashMap<Integer, Integer>();
     private final Map<Integer, Integer> inverseOrigIndex = new HashMap<Integer, Integer>();
     private final TestCase[] constraints;
+    private final Collection<Collection<BoundParam>> tested;
 
     public IPOG(final Object[][] input, final int t) {
-        this(input, t, new Integer[][]{});
+        this(input, t, new Integer[][] {}, new Object[][] {});
     }
 
-    public IPOG(final Object[][] input, final int t, final Integer[][] constraints) {
+    public IPOG(final Object[][] input, final int t,
+            final Integer[][] constraints, final Object[][] tested) {
         this.t = t;
         this.inputParams = input;
+        this.tested = new ArrayList<Collection<BoundParam>>(tested.length);
 
         // sort input params and create a shared object pool
         final IndexArrayPair[] tmp = new IndexArrayPair[input.length];
@@ -53,6 +56,7 @@ class IPOG {
             tmp[k] = new IndexArrayPair(k, input[k]);
         }
         Arrays.sort(tmp, new ArrayLengthComparator());
+        final Map<Integer, Map<Object, BoundParam>> origParamMap = new HashMap<Integer, Map<Object, BoundParam>>();
         this.unboundParams = new UnboundParam[tmp.length];
         this.boundParams = new BoundParam[tmp.length][];
         for (int k = 0; k < tmp.length; k++) {
@@ -61,9 +65,22 @@ class IPOG {
             this.unboundParams[k] = new UnboundParam(k);
             this.boundParams[k] = new BoundParam[tmp[k].getArr().length];
 
+            origParamMap.put(tmp[k].getI(),
+                    new HashMap<Object, BoundParam>());
             for (int h = 0; h < this.boundParams[k].length; h++) {
                 this.boundParams[k][h] = new BoundParam(k, h);
+                origParamMap.get(tmp[k].getI()).put(tmp[k].getArr()[h],
+                        this.boundParams[k][h]);
             }
+        }
+
+        for (final Object[] innerTestCase : tested) {
+            final Collection<BoundParam> newCase = new ArrayList<BoundParam>(
+                    innerTestCase.length);
+            for (int k = 0; k < innerTestCase.length; k++) {
+                newCase.add(origParamMap.get(k).get(innerTestCase[k]));
+            }
+            this.tested.add(newCase);
         }
 
         // setup constraints
@@ -73,8 +90,8 @@ class IPOG {
             final TestCase testCase = new TestCase(unboundParams, boundParams);
             this.constraints[i] = testCase;
 
-            for(int k = 0; k < constraint.length; k++ ) {
-                if(constraint[k] != null) {
+            for (int k = 0; k < constraint.length; k++) {
+                if (constraint[k] != null) {
                     testCase.add(boundParams[inverseOrigIndex.get(k)][constraint[k]]);
                 }
             }
@@ -111,7 +128,9 @@ class IPOG {
             for (int i = 0; i < innerArr.length; i++) {
                 testCase.add(boundParams[i][innerArr[i]]);
             }
-            testCases.add(testCase);
+            if (!hasTested(testCase)) {
+                testCases.add(testCase);
+            }
         }
 
         return testCases;
@@ -149,11 +168,24 @@ class IPOG {
                 for (int k = 0; k < innerArr.length; k++) {
                     testCase.add(boundParams[comb[k]][innerArr[k]]);
                 }
-                testCases.add(testCase);
+                if (!hasTested(testCase)) {
+                    testCases.add(testCase);
+                }
             }
         }
 
         return testCases;
+    }
+
+    private boolean hasTested(final TestCase testCase) {
+        boolean result = false;
+        for (final Collection<BoundParam> innerCase : tested) {
+            if (testCase.containsAll(innerCase)) {
+                result = true;
+                break;
+            }
+        }
+        return result;
     }
 
     Object[][] run() {
@@ -226,8 +258,8 @@ class IPOG {
 
     private Object[] fillUnbound(final TestCase testCase) {
         final Object[] result = new Object[boundParams.length];
-        for(final Param param : testCase) {
-            if(param.isBound()) {
+        for (final Param param : testCase) {
+            if (param.isBound()) {
                 final int i = origIndex.get(param.i());
                 result[i] = inputParams[i][((BoundParam) param).j()];
             }
@@ -235,16 +267,17 @@ class IPOG {
 
         TestCase innerTestCase = testCase;
 
-        for(int k = 0; k < result.length; k++) {
-            if(result[k] != null) {
+        for (int k = 0; k < result.length; k++) {
+            if (result[k] != null) {
                 continue;
             }
 
             final Object[] origParams = inputParams[k];
-            for(int h = 0; h < origParams.length; h++) {
-                final BoundParam innerParam = boundParams[inverseOrigIndex.get(k)][h];
+            for (int h = 0; h < origParams.length; h++) {
+                final BoundParam innerParam = boundParams[inverseOrigIndex
+                        .get(k)][h];
                 testCase.add(innerParam);
-                if(testCase.hasAnyConstraint()) {
+                if (testCase.hasAnyConstraint()) {
                     testCase.remove(innerParam);
                     continue;
                 } else {
@@ -252,12 +285,12 @@ class IPOG {
                     break;
                 }
             }
-            if(result[k] == null) {
+            if (result[k] == null) {
                 return null;
             }
         }
 
-        if(innerTestCase.hasAnyConstraint()) {
+        if (innerTestCase.hasAnyConstraint() || hasTested(innerTestCase)) {
             return null;
         }
 
@@ -292,7 +325,7 @@ class IPOG {
             testCase.remove(currentParam);
         }
 
-        if(testCase.hasAnyConstraint()) {
+        if (testCase.hasAnyConstraint()) {
             return null;
         }
 
