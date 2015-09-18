@@ -8,7 +8,7 @@ Dither is in the Maven Central Repository.
 <dependency>
 	<groupId>com.github.jesg</groupId>
 	<artifactId>dither</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<scope>test</scope>
 </dependency>
 ```
@@ -40,7 +40,7 @@ Object[][] results3constraints = Dither.ipog(3, new Object[][] {
         new Object[] { 0, 1 },
         new Object[] { true, false },
         new Object[] { "cat", "dog", "bird" }},
-        new Integer[][]{  // constraints
+        new Integer[][]{  add previously tested example to README// constraints
 			new Integer[]{null, null, 0, 1}}, // exclude true dog combination
 		new Object[][]{new Object[]{ 0, 0, true, "cat" }});  // previously tested cases
 ...
