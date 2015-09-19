@@ -23,7 +23,7 @@ import java.util.List;
  */
 
 public class Dither {
-    
+
     private static final Integer[][] EMPTY_CONSTRAINTS = new Integer[][]{};
     private static final Object[][] EMPTY_PREVIOUSLY_TESTED = new Object[][]{};
 
@@ -31,7 +31,7 @@ public class Dither {
             throws DitherError {
         return new IPOG(params, t, constraints, previouslyTested).run();
     }
-    
+
     public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints)
             throws DitherError {
         return new IPOG(params, t, constraints, EMPTY_PREVIOUSLY_TESTED).run();
@@ -63,7 +63,7 @@ public class Dither {
         for(int i = 0; i < innerPerviouslyTested.length; i++) {
             innerPerviouslyTested[i] = (Object[]) previouslyTested[i];
         }
-        
+
         return new IPOG(innerParams, t, innerConstraints, innerPerviouslyTested).run();
     }
 }
