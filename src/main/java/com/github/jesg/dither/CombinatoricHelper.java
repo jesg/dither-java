@@ -22,6 +22,7 @@ package com.github.jesg.dither;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 class CombinatoricHelper {
@@ -60,6 +61,25 @@ class CombinatoricHelper {
         }
         return result;
     }
+
+
+		public static <T> List<List<T>> product(final T[][] args) {
+			final int[] tmp = new int[args.length];
+			for(int i = 0; i < tmp.length; i++) {
+				tmp[i] = args[i].length;
+			}
+
+			final int[][] solution = product(tmp);
+			final List<List<T>> results = new ArrayList<List<T>>(solution.length);
+			for(int i = 0; i < solution.length; i++) {
+				final List<T> inner = new ArrayList<T>(args.length);
+				results.add(i, inner);
+				for(int j = 0; j < args.length; j++) {
+					results.get(i).add(j, args[j][solution[i][j]]);
+				}
+			}
+			return results;
+		}
 
     public static int[][] product(final int[] input) {
         int[][] result = _product(input[0], input[1]);
