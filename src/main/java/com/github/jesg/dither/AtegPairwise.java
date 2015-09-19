@@ -1,10 +1,13 @@
 package com.github.jesg.dither;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadLocalRandom;
 
 /*
  * #%L
@@ -35,14 +38,34 @@ class AtegPairwise extends Ateg {
 	private final Pair[][] pairCache;
 	private final List<Pair[]> coverage;
 	private final AtegRandom random;
+	private final ExecutorService executor;
+	private final Semaphore barrier;
+	private final List<Callable<Void>> tasks = new ArrayList<Callable<Void>>(n);
 
-
-	public AtegPairwise(final Object[][] params) {
+	public AtegPairwise(final Object[][] params, final ExecutorService executor) {
 		this.params = params;
+		this.executor = executor;
+		this.barrier = new Semaphore(0);
 
+		for(int i = 0; i < n; i++) {
+			final int index = i;
+			final Semaphore localBarrier = this.barrier;
+			tasks.add(new Callable<Void>() {
+				public Void call() {
+					generate(index);
+					fitness(index);
+					localBarrier.release();
+					return null;
+				}
+			});
+		}
+
+		// this.random = new AtegRandom() {
+		// 	final Random random = new Random(0);
+		// 	public int nextInt(int i) { return random.nextInt(i); }
+		// };
 		this.random = new AtegRandom() {
-			final Random random = new Random(0);
-			public int nextInt(int i) { return random.nextInt(i); }
+			public int nextInt(final int i) { return ThreadLocalRandom.current().nextInt(0, i); }
 		};
 
 		this.pairCache = new Pair[params.length][];
@@ -83,8 +106,12 @@ class AtegPairwise extends Ateg {
 	}
 
 	public Object[] next() {
-		generate();
-		fitness();
+		try {
+			executor.invokeAll(tasks);
+			barrier.acquire(n);
+		} catch(InterruptedException e) {
+			return null;
+		}
 		final int i = bestFit();
 		if(fitness[i] == 0) {
 			return null;

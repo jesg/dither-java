@@ -19,15 +19,11 @@ package com.github.jesg.dither;
  * limitations under the License.
  * #L%
  */
+import static org.junit.Assert.assertTrue;
 
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.Executors;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class AtegTest {
@@ -35,7 +31,7 @@ public class AtegTest {
     @Test
     public void canRunAteg() {
 			Ateg ateg = new AtegPairwise(new Object[][] { new Object[] { 1, 2 },
-                new Object[] { 3, 4 } });
+                new Object[] { 3, 4 } }, Executors.newFixedThreadPool(4));
 			List<Object[]> result = ateg.toList();
 			assertTrue(result.size() == 4);
     }
