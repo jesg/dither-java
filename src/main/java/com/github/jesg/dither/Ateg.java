@@ -26,22 +26,22 @@ import java.util.List;
 
 public abstract class Ateg implements Iterator<Object[]> {
 
-	public abstract boolean hasNext();
-	public abstract Object[] next();
+    public abstract boolean hasNext();
+    public abstract Object[] next();
 
-	public List<Object[]> toList() {
-		final List<Object[]> results = new LinkedList<Object[]>();
+    public List<Object[]> toList() {
+        final List<Object[]> results = new LinkedList<Object[]>();
 
-		while(hasNext()) {
-			final Object[] result = next();
-			if(result != null) {
-				results.add(result);
-			}
-		}
+        while(hasNext()) {
+            final Object[] result = next();
+            if(result != null) {
+                results.add(result);
+            }
+        }
 
-		return results;
-	}
+        return results;
+    }
 
-	public void remove() {}
+    public void remove() {}
 
 }

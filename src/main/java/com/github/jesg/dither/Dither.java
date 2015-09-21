@@ -1,6 +1,9 @@
 package com.github.jesg.dither;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /*
  * #%L
@@ -65,5 +68,22 @@ public class Dither {
         }
 
         return new IPOG(innerParams, t, innerConstraints, innerPerviouslyTested).run();
+    }
+
+    public static List<Object[]> ateg(final Object[][] params)
+        throws DitherError {
+        return ateg(2, params);
+    }
+
+    public static List<Object[]> ateg(final int t, final Object[][] params)
+        throws DitherError {
+        final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<Object[]> result = Collections.emptyList();
+        try {
+            result = new AtegPairwise(t, params, executor).toList();
+        } finally {
+            executor.shutdown();
+        }
+        return result;
     }
 }

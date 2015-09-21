@@ -56,15 +56,15 @@ public class CombinatoricHelperTest {
     @Test
     public void canProduct2() {
         List<List<Object>> product = CombinatoricHelper.product(new Object[][]{
-					new Object[] { "hello", "world" },
-					new Object[] { true, false }
-				});
-				assertEquals(Arrays.asList(new Object[] {
-					    Arrays.asList(new Object[] {"hello", true }),
-							Arrays.asList(new Object[] {"hello", false}),
-							Arrays.asList(new Object[] {"world", true }),
-							Arrays.asList(new Object[] {"world", false})
-				}), product);
+            new Object[] { "hello", "world" },
+                new Object[] { true, false }
+        });
+        assertEquals(Arrays.asList(new Object[] {
+            Arrays.asList(new Object[] {"hello", true }),
+                Arrays.asList(new Object[] {"hello", false}),
+                Arrays.asList(new Object[] {"world", true }),
+                Arrays.asList(new Object[] {"world", false})
+        }), product);
     }
 
     @Test
