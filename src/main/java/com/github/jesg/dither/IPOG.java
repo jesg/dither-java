@@ -190,8 +190,6 @@ class IPOG {
 
     Object[][] run() {
         final List<TestCase> testSet = allCombinations();
-        Collection<BoundParam> miss = Arrays.asList(new BoundParam(3, 0),
-                new BoundParam(2, 0));
         for (int k = t; k < boundParams.length; k++) {
             final Collection<TestCase> pi = combinations(k);
 
