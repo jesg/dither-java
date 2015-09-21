@@ -77,6 +77,19 @@ public class Dither {
 
     public static List<Object[]> ateg(final int t, final Object[][] params)
         throws DitherError {
+        // validate input
+        if (t <= 1) {
+            throw new DitherError("t must be >= 2");
+        }
+
+        if (t > params.length) {
+            throw new DitherError("t must be <= params.length");
+        }
+        for (final Object[] param : params) {
+            if (param.length < 2) {
+                throw new DitherError("param length must be > 1");
+            }
+        }
         final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         List<Object[]> result = Collections.emptyList();
         try {

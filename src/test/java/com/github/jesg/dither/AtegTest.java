@@ -8,6 +8,21 @@ import org.junit.Test;
 
 public class AtegTest {
 
+    @Test(expected = DitherError.class)
+    public void tMustBeGreaterThan2() {
+        Dither.ateg(0, new Object[][]{});
+    }
+
+    @Test(expected = DitherError.class)
+    public void tMustBeGreaterThanParamLength() {
+        Dither.ateg(3, new Object[][] { new Object[] {} });
+    }
+
+    @Test(expected = DitherError.class)
+    public void paramsLengthMustBeGreaterThan2() {
+        Dither.ateg(2, new Object[][] { new Object[] {}, new Object[] {} });
+    }
+
     @Test
     public void canRunAteg() {
         List<Object[]> result = Dither.ateg(
