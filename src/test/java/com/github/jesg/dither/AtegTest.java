@@ -49,17 +49,17 @@ public class AtegTest {
 
     @Test
     public void canRunAteg() {
-        List<Object[]> result = Dither.ateg(
+        Object[][] result = Dither.ateg(
                 new Object[][] {
                     new Object[] { 1, 2 },
                     new Object[] { 3, 4 }
                 });
-        assertTrue(result.size() == 4);
+        assertTrue(result.length == 4);
     }
 
     @Test
     public void canRunAteg2() {
-        List<Object[]> result = Dither.ateg(3,
+        Object[][] result = Dither.ateg(3,
                 new Object[][] {
                     new Object[] { 1, 2 },
                     new Object[] { 1, 2 },
@@ -74,12 +74,12 @@ public class AtegTest {
                     new Object[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
                     new Object[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
                 });
-        assertTrue(result.size() > 100);
+        assertTrue(result.length > 100);
     }
 
     @Test
     public void canCompute3WayAtegWithConstraintsAndPreviouslyTested() {
-        List<Object[]> results = Dither.ateg(3, 0, new Object[][] { new Object[] { 0, 1 },
+        Object[][] results = Dither.ateg(3, 0, new Object[][] { new Object[] { 0, 1 },
                 new Object[] { 0, 1 },
                 new Object[] { 0, 1, 2, 3 }},
                 new Integer[][]{ new Integer[]{0, null, 2}, new Integer[]{0, 1, 0}},
@@ -112,7 +112,7 @@ public class AtegTest {
 
     @Test
     public void anotherCompute3WayAtegWithConstraints() {
-        List<Object[]> results = Dither.ateg(3, 0, new Object[][] { new Object[] { 0, 1 },
+        Object[][] results = Dither.ateg(3, 0, new Object[][] { new Object[] { 0, 1 },
                 new Object[] { 0, 1 },
                 new Object[] { 0, 1 },
                 new Object[] { 0, 1, 2, 3 }},

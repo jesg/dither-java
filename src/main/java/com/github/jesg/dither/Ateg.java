@@ -42,6 +42,10 @@ public abstract class Ateg implements Iterator<Object[]> {
         return results;
     }
 
+    public Object[][] toArray() {
+        return toList().toArray(new Object[][]{});
+    }
+
     public void remove() {}
 
 }

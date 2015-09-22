@@ -75,27 +75,46 @@ public class Dither {
         return new IPOG(innerParams, t, innerConstraints, innerPerviouslyTested).run();
     }
 
-    public static List<Object[]> ateg(final Object[][] params)
+    public static Object[][] ateg(final Object[][] params)
         throws DitherError {
         return ateg(2, params);
     }
 
-    public static List<Object[]> ateg(final int t, final Object[][] params) {
+    public static Object[][] ateg(final int t, final Object[][] params) {
         return ateg(t, null, params, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED);
     }
 
-    public static List<Object[]> ateg(final int t, final Integer seed, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
+    public static Object[][] ateg(final int t, final Integer seed, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
         throws DitherError {
         validateInput(t, params);
         final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        List<Object[]> result = Collections.emptyList();
+        Object[][] result = new Object[][]{};
         try {
-            result = new AtegPairwise(t, seed, params, constraints, previouslyTested, executor).toList();
+            result = new AtegPairwise(t, seed, params, constraints, previouslyTested, executor).toArray();
         } finally {
             executor.shutdownNow();
         }
         return result;
     }
+
+    public static Object[][] ateg(final int t, final Integer seed, final Object[] params, final Object[] constraints, final Object[] previouslyTested) {
+        final Object[][] innerParams = new Object[params.length][];
+        for(int i = 0; i < innerParams.length; i++) {
+            innerParams[i] = (Object[]) params[i];
+        }
+        validateInput(t, innerParams);
+
+        final Integer[][] innerConstraints = new Integer[constraints.length][];
+        for(int i = 0; i < innerConstraints.length; i++) {
+            innerConstraints[i] = (Integer[]) constraints[i];
+        }
+
+        final Object[][] innerPerviouslyTested = new Object[previouslyTested.length][];
+        for(int i = 0; i < innerPerviouslyTested.length; i++) {
+            innerPerviouslyTested[i] = (Object[]) previouslyTested[i];
+        }
+		return ateg(t, seed, innerParams, innerConstraints, innerPerviouslyTested);
+	}
 
     private static void validateInput(final int t, final Object[][] params) throws DitherError {
         if (t <= 1) {
