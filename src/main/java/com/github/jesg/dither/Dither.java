@@ -32,30 +32,35 @@ public class Dither {
 
     public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
             throws DitherError {
+        validateInput(t, params);
         return new IPOG(params, t, constraints, previouslyTested).run();
     }
 
     public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints)
             throws DitherError {
+        validateInput(t, params);
         return new IPOG(params, t, constraints, EMPTY_PREVIOUSLY_TESTED).run();
     }
 
     public static Object[][] ipog(final int t, final Object[][] params)
             throws DitherError {
+        validateInput(t, params);
         return new IPOG(params, t, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED).run();
     }
 
     public static Object[][] ipog(final Object[][] params)
             throws DitherError {
+        validateInput(2, params);
         return new IPOG(params, 2, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED).run();
     }
 
     public static Object[][] ipog(final int t, final Object[] params, final Object[] constraints, final Object[] previouslyTested)
-            throws DitherError {
+        throws DitherError {
         final Object[][] innerParams = new Object[params.length][];
         for(int i = 0; i < innerParams.length; i++) {
             innerParams[i] = (Object[]) params[i];
         }
+        validateInput(t, innerParams);
 
         final Integer[][] innerConstraints = new Integer[constraints.length][];
         for(int i = 0; i < innerConstraints.length; i++) {
@@ -81,7 +86,18 @@ public class Dither {
 
     public static List<Object[]> ateg(final int t, final Integer seed, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
         throws DitherError {
-        // validate input
+        validateInput(t, params);
+        final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<Object[]> result = Collections.emptyList();
+        try {
+            result = new AtegPairwise(t, seed, params, constraints, previouslyTested, executor).toList();
+        } finally {
+            executor.shutdownNow();
+        }
+        return result;
+    }
+
+    private static void validateInput(final int t, final Object[][] params) throws DitherError {
         if (t <= 1) {
             throw new DitherError("t must be >= 2");
         }
@@ -94,13 +110,5 @@ public class Dither {
                 throw new DitherError("param length must be > 1");
             }
         }
-        final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-        List<Object[]> result = Collections.emptyList();
-        try {
-            result = new AtegPairwise(t, seed, params, constraints, previouslyTested, executor).toList();
-        } finally {
-            executor.shutdownNow();
-        }
-        return result;
     }
 }

@@ -96,20 +96,6 @@ class IPOG {
                 }
             }
         }
-
-        // validate input
-        if (t <= 1) {
-            throw new DitherError("t must be >= 2");
-        }
-
-        if (t > input.length) {
-            throw new DitherError("t must be <= params.length");
-        }
-        for (final Object[] param : input) {
-            if (param.length < 2) {
-                throw new DitherError("param length must be > 1");
-            }
-        }
     }
 
     List<TestCase> allCombinations() {

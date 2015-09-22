@@ -46,17 +46,17 @@ public class IPOGTest {
 
     @Test(expected = DitherError.class)
     public void tMustBeGreaterThan2() {
-        new IPOG(new Object[][] {}, 0);
+        Dither.ipog(0, new Object[][] {});
     }
 
     @Test(expected = DitherError.class)
     public void tMustBeGreaterThanParamLength() {
-        new IPOG(new Object[][] { new Object[] {} }, 3);
+        Dither.ipog(3, new Object[][] { new Object[] {} });
     }
 
     @Test(expected = DitherError.class)
     public void paramsLengthMustBeGreaterThan2() {
-        new IPOG(new Object[][] { new Object[] {}, new Object[] {} }, 2);
+        Dither.ipog(new Object[][] { new Object[] {}, new Object[] {} });
     }
 
     @Test
@@ -71,13 +71,6 @@ public class IPOGTest {
         assertTrue(testCases.get(2).contains(new BoundParam(1, 0)));
     }
 
-    /*
-     * @Test public void canGetCombinations() { IPOG ipog = new IPOG(new
-     * Object[][]{new Object[]{1,2},new Object[]{3,4},new Object[]{5,6},new
-     * Object[]{7,8}},2); List<TestCase> testCases = ipog.combinations(3);
-     * assertTrue(testCases.get(4).containsAll(Arrays.asList(new
-     * BoundParam(1,0),new BoundParam(3,0)))); }
-     */
 
     @Test
     public void canGen3WayCases() {
