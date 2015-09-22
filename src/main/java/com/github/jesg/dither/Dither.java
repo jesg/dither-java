@@ -27,8 +27,8 @@ import java.util.concurrent.Executors;
 
 public class Dither {
 
-    private static final Integer[][] EMPTY_CONSTRAINTS = new Integer[][]{};
-    private static final Object[][] EMPTY_PREVIOUSLY_TESTED = new Object[][]{};
+    public static final Integer[][] EMPTY_CONSTRAINTS = new Integer[][]{};
+    public static final Object[][] EMPTY_PREVIOUSLY_TESTED = new Object[][]{};
 
     public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
             throws DitherError {
@@ -75,7 +75,11 @@ public class Dither {
         return ateg(2, params);
     }
 
-    public static List<Object[]> ateg(final int t, final Object[][] params)
+    public static List<Object[]> ateg(final int t, final Object[][] params) {
+        return ateg(t, null, params, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED);
+    }
+
+    public static List<Object[]> ateg(final int t, final Integer seed, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
         throws DitherError {
         // validate input
         if (t <= 1) {
@@ -93,9 +97,9 @@ public class Dither {
         final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         List<Object[]> result = Collections.emptyList();
         try {
-            result = new AtegPairwise(t, params, executor).toList();
+            result = new AtegPairwise(t, seed, params, constraints, previouslyTested, executor).toList();
         } finally {
-            executor.shutdown();
+            executor.shutdownNow();
         }
         return result;
     }

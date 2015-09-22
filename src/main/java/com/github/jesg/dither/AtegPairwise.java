@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
@@ -27,7 +28,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  * #L%
- */
+ True*/
 
 class AtegPairwise extends Ateg {
 
@@ -41,8 +42,9 @@ class AtegPairwise extends Ateg {
     private final ExecutorService executor;
     private final Semaphore barrier;
     private final List<Callable<Void>> tasks = new ArrayList<Callable<Void>>(n);
+    private final Pair[][] constraints;
 
-    public AtegPairwise(final int t, final Object[][] params, final ExecutorService executor) {
+    public AtegPairwise(final int t, final Integer seed, final Object[][] params, final Integer[][] constraintsParam, final Object[][] previouslyTested, final ExecutorService executor) {
         this.params = params;
         this.executor = executor;
         this.barrier = new Semaphore(0);
@@ -63,9 +65,16 @@ class AtegPairwise extends Ateg {
             });
         }
 
-        this.random = new AtegRandom() {
-            public int nextInt(final int i) { return ThreadLocalRandom.current().nextInt(0, i); }
-        };
+        if(seed == null) {
+            this.random = new AtegRandom() {
+                public int nextInt(final int i) { return ThreadLocalRandom.current().nextInt(0, i); }
+            };
+        } else {
+            this.random = new AtegRandom() {
+                final Random random = new Random(seed);
+                public int nextInt(final int i) { return random.nextInt(i); }
+            };
+        }
 
         this.pairCache = new Pair[params.length][];
         for(int i = 0; i < params.length; i++) {
@@ -75,6 +84,34 @@ class AtegPairwise extends Ateg {
                 this.pairCache[i][j] = new Pair(i, j);
             }
         }
+
+        this.constraints = new Pair[constraintsParam.length + previouslyTested.length][];
+        int constraintIndex = 0;
+        for(final Integer[] constraint : constraintsParam) {
+            final List<Pair> pairs = new ArrayList<Pair>();
+            for(int i = 0; i < constraint.length; i++) {
+                if(constraint[i] == null) {
+                    continue;
+                }
+                pairs.add(pairCache[i][constraint[i]]);
+            }
+            constraints[constraintIndex++] = pairs.toArray(new Pair[]{});
+        }
+
+        for(final Object[] testCase : previouslyTested) {
+            final Pair[] pairs = new Pair[testCase.length];
+            for(int i = 0; i < pairs.length; i++) {
+                final Object currentObject = testCase[i];
+                for(int j = 0; j < params[i].length; j++) {
+                    if(currentObject.equals(params[i][j])) {
+                        pairs[i] = pairCache[i][j];
+                        break;
+                    }
+                }
+            }
+            constraints[constraintIndex++] = pairs;
+        }
+
 
         for(int u = 0; u < n; u++) {
             scratch[u] = new int[params.length];
@@ -98,8 +135,25 @@ class AtegPairwise extends Ateg {
                 pairs[i] = this.pairCache[tmp[i]];
             }
 
+outer:
             for(final List<Pair> innerPairs : CombinatoricHelper.product(pairs)) {
-                coverage.add(innerPairs.toArray(new Pair[innerPairs.size()]));
+                final Pair[] innerComb = innerPairs.toArray(new Pair[innerPairs.size()]);
+
+                for(final Pair[] constraint : constraints) {
+                    int count = 0;
+                    for(final Pair pair : constraint) {
+                        for(final Pair innerCombPair : innerComb) {
+                            if(pair.equals(innerCombPair)) {
+                                count++;
+                                break;
+                            }
+                        }
+                    }
+                    if(count == constraint.length) {
+                        continue outer;
+                    }
+                }
+                coverage.add(innerComb);
             }
         }
     }
@@ -118,7 +172,7 @@ class AtegPairwise extends Ateg {
             return null;
         }
         final int i = bestFit();
-        if(fitness[i] == 0) {
+        if(fitness[i] <= 0) {
             return null;
         }
         final int[] best = scratch[i];
@@ -148,6 +202,18 @@ class AtegPairwise extends Ateg {
 
     private void fitness(final int i) {
         final int[] cases = scratch[i];
+        for(final Pair[] constraint : constraints) {
+            int count = 0;
+            for(final Pair pair : constraint) {
+                if(pair.j == cases[pair.i]) {
+                    count++;
+                }
+            }
+            if(count == constraint.length) {
+                fitness[i] = -1;
+                return;
+            }
+        }
         int count = 0;
         for(final Pair[] pairs : coverage) {
             if(match(pairs, cases)) {
