@@ -1,6 +1,9 @@
 package com.github.jesg.dither;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /*
  * #%L
@@ -24,8 +27,8 @@ import java.util.List;
 
 public class Dither {
 
-    private static final Integer[][] EMPTY_CONSTRAINTS = new Integer[][]{};
-    private static final Object[][] EMPTY_PREVIOUSLY_TESTED = new Object[][]{};
+    public static final Integer[][] EMPTY_CONSTRAINTS = new Integer[][]{};
+    public static final Object[][] EMPTY_PREVIOUSLY_TESTED = new Object[][]{};
 
     public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
             throws DitherError {
@@ -65,5 +68,39 @@ public class Dither {
         }
 
         return new IPOG(innerParams, t, innerConstraints, innerPerviouslyTested).run();
+    }
+
+    public static List<Object[]> ateg(final Object[][] params)
+        throws DitherError {
+        return ateg(2, params);
+    }
+
+    public static List<Object[]> ateg(final int t, final Object[][] params) {
+        return ateg(t, null, params, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED);
+    }
+
+    public static List<Object[]> ateg(final int t, final Integer seed, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
+        throws DitherError {
+        // validate input
+        if (t <= 1) {
+            throw new DitherError("t must be >= 2");
+        }
+
+        if (t > params.length) {
+            throw new DitherError("t must be <= params.length");
+        }
+        for (final Object[] param : params) {
+            if (param.length < 2) {
+                throw new DitherError("param length must be > 1");
+            }
+        }
+        final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        List<Object[]> result = Collections.emptyList();
+        try {
+            result = new AtegPairwise(t, seed, params, constraints, previouslyTested, executor).toList();
+        } finally {
+            executor.shutdownNow();
+        }
+        return result;
     }
 }

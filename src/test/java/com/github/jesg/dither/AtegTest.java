@@ -1,0 +1,106 @@
+package com.github.jesg.dither;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.Test;
+
+public class AtegTest {
+
+    @Test(expected = DitherError.class)
+    public void tMustBeGreaterThan2() {
+        Dither.ateg(0, new Object[][]{});
+    }
+
+    @Test(expected = DitherError.class)
+    public void tMustBeGreaterThanParamLength() {
+        Dither.ateg(3, new Object[][] { new Object[] {} });
+    }
+
+    @Test(expected = DitherError.class)
+    public void paramsLengthMustBeGreaterThan2() {
+        Dither.ateg(2, new Object[][] { new Object[] {}, new Object[] {} });
+    }
+
+    @Test
+    public void canRunAteg() {
+        List<Object[]> result = Dither.ateg(
+                new Object[][] {
+                    new Object[] { 1, 2 },
+                    new Object[] { 3, 4 }
+                });
+        assertTrue(result.size() == 4);
+    }
+
+    @Test
+    public void canRunAteg2() {
+        List<Object[]> result = Dither.ateg(3,
+                new Object[][] {
+                    new Object[] { 1, 2 },
+                    new Object[] { 1, 2 },
+                    new Object[] { 1, 2 },
+                    new Object[] { 1, 2 },
+                    new Object[] { 1, 2 },
+                    new Object[] { 1, 2 },
+                    new Object[] { 1, 2 },
+                    new Object[] { 1, 2, 3 },
+                    new Object[] { 1, 2, 3 },
+                    new Object[] { 1, 2, 3, 4 },
+                    new Object[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+                    new Object[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }
+                });
+        assertTrue(result.size() > 100);
+    }
+
+    @Test
+    public void canCompute3WayAtegWithConstraintsAndPreviouslyTested() {
+        List<Object[]> results = Dither.ateg(3, 0, new Object[][] { new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1, 2, 3 }},
+                new Integer[][]{ new Integer[]{0, null, 2}, new Integer[]{0, 1, 0}},
+                new Object[][]{new Object[]{0, 0, 0}}
+        );
+
+        Set<List<Object>> actuals = new HashSet<List<Object>>();
+        for(Object[] result : results) {
+            actuals.add(Arrays.asList(result));
+        }
+
+        List<List<Integer>> expected = Arrays.asList(
+                Arrays.asList(1, 0, 0),
+                Arrays.asList(1, 1, 0),
+                Arrays.asList(0, 0, 1),
+                Arrays.asList(1, 0, 1),
+                Arrays.asList(0, 1, 1),
+                Arrays.asList(1, 1, 1),
+                Arrays.asList(1, 0, 2),
+                Arrays.asList(1, 1, 2),
+                Arrays.asList(0, 0, 3),
+                Arrays.asList(1, 0, 3),
+                Arrays.asList(0, 1, 3),
+                Arrays.asList(1, 1, 3));
+
+        for(List expectedResult : expected) {
+            assertTrue("expected " + expectedResult, actuals.contains(expectedResult));
+        }
+    }
+
+    @Test
+    public void anotherCompute3WayAtegWithConstraints() {
+        List<Object[]> results = Dither.ateg(3, 0, new Object[][] { new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1, 2, 3 }},
+                new Integer[][]{ new Integer[]{0, 1, 0}}, Dither.EMPTY_PREVIOUSLY_TESTED);
+
+        for(Object[] result : results) {
+            assertFalse("satisfy constraint 0, 1, 0... " + Arrays.toString(result),
+                    (result[0] == (Integer)0 && result[1] == (Integer)1 && result[2] == (Integer)0));
+        }
+    }
+}

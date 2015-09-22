@@ -21,7 +21,9 @@ package com.github.jesg.dither;
  */
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Before;
@@ -49,6 +51,20 @@ public class CombinatoricHelperTest {
                 new int[][] { { 0, 0, 0 }, { 0, 0, 1 }, { 0, 1, 0 },
                         { 0, 1, 1 }, { 1, 0, 0 }, { 1, 0, 1 }, { 1, 1, 0 },
                         { 1, 1, 1 } }, product);
+    }
+
+    @Test
+    public void canProduct2() {
+        List<List<Object>> product = CombinatoricHelper.product(new Object[][]{
+            new Object[] { "hello", "world" },
+                new Object[] { true, false }
+        });
+        assertEquals(Arrays.asList(new Object[] {
+            Arrays.asList(new Object[] {"hello", true }),
+                Arrays.asList(new Object[] {"hello", false}),
+                Arrays.asList(new Object[] {"world", true }),
+                Arrays.asList(new Object[] {"world", false})
+        }), product);
     }
 
     @Test
