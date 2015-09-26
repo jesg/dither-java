@@ -19,8 +19,8 @@ package com.github.jesg.dither;
  * limitations under the License.
  * #L%
  */
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -31,14 +31,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class IPOGTest {
-
-    private static final UnboundParam[] unboundParams = new UnboundParam[] {
-            new UnboundParam(0), new UnboundParam(1), new UnboundParam(2),
-            new UnboundParam(3) };
-
-    private static final BoundParam[][] boundParams = new BoundParam[][] {
-            new BoundParam[] { new BoundParam(0, 0), new BoundParam(0, 1) },
-            new BoundParam[] { new BoundParam(1, 0), new BoundParam(1, 1) } };
 
     @Before
     public void setUp() throws Exception {
@@ -63,14 +55,41 @@ public class IPOGTest {
     public void canGetAllCombinations() {
         IPOG ipog = new IPOG(new Object[][] { new Object[] { 1, 2 },
                 new Object[] { 3, 4 } }, 2);
-        List<TestCase> testCases = ipog.allCombinations();
-        // spot check
-        assertTrue(testCases.get(0).contains(new BoundParam(0, 0)));
-        assertTrue(testCases.get(0).contains(new BoundParam(1, 0)));
-        assertTrue(testCases.get(2).contains(new BoundParam(0, 1)));
-        assertTrue(testCases.get(2).contains(new BoundParam(1, 0)));
+        List<int[]> testCases = ipog.allCombinations();
+        assertArrayEquals(testCases.get(0), new int[]{0, 0});
+        assertArrayEquals(testCases.get(1), new int[]{0, 1});
     }
 
+    @Test
+    public void canPerfectMerge() {
+        IPOG ipog = new IPOG(new Object[][] {
+            new Object[] { 1, 2 },
+            new Object[] { 3, 4 },
+            new Object[] { 1, 2, 3}}, 2);
+        int actual = ipog.merge(3, new Pair[]{new Pair(1, 0), new Pair(2, 0)}, new int[]{0, 0, -1});
+        assertTrue(actual == 0);
+    }
+
+    @Test
+    public void canPartialMerge() {
+        IPOG ipog = new IPOG(new Object[][] {
+            new Object[] { 1, 2 },
+            new Object[] { 3, 4 },
+            new Object[] { 1, 2, 3}}, 2);
+        int actual = ipog.merge(3, new Pair[]{new Pair(1, 0), new Pair(2, 0)}, new int[]{-1, -1, -1});
+        assertTrue(actual == 1);
+    }
+
+    @Test
+    public void canDetectConstraintInMerge() {
+        IPOG ipog = new IPOG(new Object[][] {
+            new Object[] { 1, 2 },
+            new Object[] { 3, 4 },
+            new Object[] { 1, 2, 3}}, 2, new Integer[][]{new Integer[] { 0, 0, 0}}, new Object[][]{});
+        int[] test = new int[]{0,0,-1};
+        int actual = ipog.merge(3, new Pair[]{new Pair(1, 0), new Pair(2, 0)}, test);
+        assertTrue(actual == -1);
+    }
 
     @Test
     public void canGen3WayCases() {
@@ -116,6 +135,7 @@ public class IPOGTest {
 
     @Test
     public void anotherCompute3WayIPOGWithConstraints() {
+        System.out.println("begin");
         Object[][] results = Dither.ipog(3, new Object[][] { new Object[] { 0, 1 },
                 new Object[] { 0, 1 },
                 new Object[] { 0, 1 },

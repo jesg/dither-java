@@ -22,23 +22,22 @@ package com.github.jesg.dither;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 class IPOG {
 
-    private final UnboundParam[] unboundParams;
     private final int t;
-    private final BoundParam[][] boundParams;
     private final Object[][] inputParams;
     private final Map<Integer, Integer> origIndex = new HashMap<Integer, Integer>();
     private final Map<Integer, Integer> inverseOrigIndex = new HashMap<Integer, Integer>();
-    private final TestCase[] constraints;
-    private final Collection<Collection<BoundParam>> tested;
+    private final Pair[][] constraints;
+    private final int[][] previouslyTested;
+    private final Pair[][] pairCache;
+    private final int[] mergeScratch;
 
     public IPOG(final Object[][] input, final int t) {
         this(input, t, new Integer[][] {}, new Object[][] {});
@@ -48,7 +47,8 @@ class IPOG {
             final Integer[][] constraints, final Object[][] tested) {
         this.t = t;
         this.inputParams = input;
-        this.tested = new ArrayList<Collection<BoundParam>>(tested.length);
+        this.mergeScratch = new int[input.length];
+        this.previouslyTested = new int[tested.length][input.length];
 
         // sort input params and create a shared object pool
         final IndexArrayPair[] tmp = new IndexArrayPair[input.length];
@@ -56,73 +56,68 @@ class IPOG {
             tmp[k] = new IndexArrayPair(k, input[k]);
         }
         Arrays.sort(tmp, new ArrayLengthComparator());
-        final Map<Integer, Map<Object, BoundParam>> origParamMap = new HashMap<Integer, Map<Object, BoundParam>>();
-        this.unboundParams = new UnboundParam[tmp.length];
-        this.boundParams = new BoundParam[tmp.length][];
+        final Map<Integer, Map<Object, Pair>> origParamMap = new HashMap<Integer, Map<Object, Pair>>();
+        this.pairCache = new Pair[tmp.length][];
         for (int k = 0; k < tmp.length; k++) {
             this.origIndex.put(k, tmp[k].getI());
             this.inverseOrigIndex.put(tmp[k].getI(), k);
-            this.unboundParams[k] = new UnboundParam(k);
-            this.boundParams[k] = new BoundParam[tmp[k].getArr().length];
+            this.pairCache[k] = new Pair[tmp[k].getArr().length];
 
             origParamMap.put(tmp[k].getI(),
-                    new HashMap<Object, BoundParam>());
-            for (int h = 0; h < this.boundParams[k].length; h++) {
-                this.boundParams[k][h] = new BoundParam(k, h);
+                    new HashMap<Object, Pair>());
+            for (int h = 0; h < this.pairCache[k].length; h++) {
+                this.pairCache[k][h] = new Pair(k, h);
                 origParamMap.get(tmp[k].getI()).put(tmp[k].getArr()[h],
-                        this.boundParams[k][h]);
+                        this.pairCache[k][h]);
             }
         }
 
-        for (final Object[] innerTestCase : tested) {
-            final Collection<BoundParam> newCase = new ArrayList<BoundParam>(
-                    innerTestCase.length);
+        for (int j = 0; j < previouslyTested.length; j++) {
+            final Object[] innerTestCase = tested[j];
             for (int k = 0; k < innerTestCase.length; k++) {
-                newCase.add(origParamMap.get(k).get(innerTestCase[k]));
+                previouslyTested[j][k] = origParamMap.get(k).get(innerTestCase[k]).j;
             }
-            this.tested.add(newCase);
         }
 
         // setup constraints
-        this.constraints = new TestCase[constraints.length];
+        this.constraints = new Pair[constraints.length][];
         for (int i = 0; i < constraints.length; i++) {
             final Integer[] constraint = constraints[i];
-            final TestCase testCase = new TestCase(unboundParams, boundParams);
-            this.constraints[i] = testCase;
+            final List<Pair> tmpConstraint = new ArrayList<Pair>(constraint.length);
 
             for (int k = 0; k < constraint.length; k++) {
                 if (constraint[k] != null) {
-                    testCase.add(boundParams[inverseOrigIndex.get(k)][constraint[k]]);
+                    tmpConstraint.add(pairCache[inverseOrigIndex.get(k)][constraint[k]]);
                 }
             }
+            this.constraints[i] = tmpConstraint.toArray(new Pair[]{});
         }
     }
 
-    List<TestCase> allCombinations() {
+    List<int[]> allCombinations() {
 
         final int[] prodarr = new int[t];
         for (int k = 0; k < prodarr.length; k++) {
-            prodarr[k] = boundParams[k].length;
+            prodarr[k] = pairCache[k].length;
         }
 
         final int[][] prodArrResult = CombinatoricHelper.product(prodarr);
-        final List<TestCase> testCases = new ArrayList<TestCase>(
-                prodArrResult.length);
-        for (final int[] innerArr : prodArrResult) {
-            final TestCase testCase = new TestCase(unboundParams, boundParams,
-                    constraints);
-            for (int i = 0; i < innerArr.length; i++) {
-                testCase.add(boundParams[i][innerArr[i]]);
+
+        final List<int[]> results = new LinkedList<int[]>();
+        for(int i = 0; i < prodArrResult.length; i++) {
+            final int[] result = new int[pairCache.length];
+            Arrays.fill(result, (t-1), result.length, -1);
+            for(int k = 0; k < t; k++) {
+                result[k] = prodArrResult[i][k];
             }
-            if (!hasTested(testCase)) {
-                testCases.add(testCase);
+            if(!hasTested(t, result)) {
+                results.add(result);
             }
         }
-
-        return testCases;
+        return results;
     }
 
-    Collection<TestCase> combinations(final int i) {
+    List<Pair[]> combinations(final int i) {
         final int[] innerParams = new int[i];
         for (int k = 0; k < innerParams.length; k++) {
             innerParams[k] = k;
@@ -137,183 +132,278 @@ class IPOG {
             combt.add(newArr);
         }
 
-        final Collection<TestCase> testCases = new HashSet<TestCase>(
-                combt.size());
+        final List<Pair[]> results = new LinkedList<Pair[]>();
         for (final int[] comb : combt) {
 
             final int[] prodarr = new int[comb.length];
             for (int k = 0; k < prodarr.length; k++) {
-                prodarr[k] = boundParams[comb[k]].length;
+                prodarr[k] = pairCache[comb[k]].length;
             }
 
             final int[][] prodArrResult = CombinatoricHelper.product(prodarr);
 
-            for (final int[] innerArr : prodArrResult) {
-                final TestCase testCase = new TestCase(unboundParams,
-                        boundParams, constraints);
+            for (int j = 0; j < prodArrResult.length; j++) {
+                final int[] innerArr = prodArrResult[j];
+                final Pair[] pairs = new Pair[innerArr.length];
                 for (int k = 0; k < innerArr.length; k++) {
-                    testCase.add(boundParams[comb[k]][innerArr[k]]);
+                    pairs[k] = pairCache[comb[k]][innerArr[k]];
                 }
-                if (!hasTested(testCase)) {
-                    testCases.add(testCase);
+                if (!hasTested(pairs)) {
+                    results.add(pairs);
                 }
             }
         }
 
-        return testCases;
+        return results;
     }
 
-    private boolean hasTested(final TestCase testCase) {
-        boolean result = false;
-        for (final Collection<BoundParam> innerCase : tested) {
-            if (testCase.containsAll(innerCase)) {
-                result = true;
-                break;
+    private boolean hasTested(final int[] testCase) {
+        for (final int[] innerCase : previouslyTested) {
+            if(Arrays.equals(testCase, innerCase)) {
+                return true;
             }
         }
-        return result;
+        return false;
+    }
+
+    private boolean hasTested(final int t, final int[] testCase) {
+outer:
+        for (final int[] innerCase : previouslyTested) {
+            for(int i = 0; i < t; i++) {
+                if(innerCase[i] != testCase[i]) {
+                    continue outer;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean hasTested(final Pair[] testCase) {
+outer:
+        for (final int[] innerCase : previouslyTested) {
+            for(final Pair pair : testCase) {
+                if(innerCase[pair.i] != pair.j) {
+                    continue outer;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     Object[][] run() {
-        final List<TestCase> testSet = allCombinations();
-        for (int k = t; k < boundParams.length; k++) {
-            final Collection<TestCase> pi = combinations(k);
+        final List<int[]> testSet = allCombinations();
+        final List<int[]> unbound = new LinkedList<int[]>();
+        for (int k = t; k < pairCache.length; k++) {
+            final List<Pair[]> pi = combinations(k);
 
             // horizontal extension for parameter i
-            final Collection<TestCase> toDelete = new ArrayList<TestCase>();
-            for (final TestCase testCase : testSet) {
-                final Collection<TestCase> cover = maximizeCoverage(k,
+            final ListIterator<int[]> iterTestSet = testSet.listIterator();
+            while(iterTestSet.hasNext()) {
+                final int[] testCase = iterTestSet.next();
+                final int max = maximizeCoverage(k,
                         testCase, pi);
-
-                if (cover == null) {
-                    toDelete.add(testCase);
+                if(max < 0) {
+                    iterTestSet.remove();
                 } else {
-                    pi.removeAll(cover);
+                    // remove matches
+                    final ListIterator<Pair[]> iter = pi.listIterator();
+iter:
+                    while(iter.hasNext()) {
+                        for(final Pair pair : iter.next()) {
+                            if(testCase[pair.i] != pair.j) {
+                                continue iter;
+                            }
+                        }
+                        iter.remove();
+                    }
                 }
             }
-            testSet.removeAll(toDelete);
 
             // vertical extension for parameter i
-            while (!pi.isEmpty()) {
-                final TestCase testCase = pi.iterator().next();
+            final ListIterator<Pair[]> piIter = pi.listIterator();
+            while (piIter.hasNext()) {
+                final Pair[] testCase = piIter.next();
                 boolean isCaseCovered = false;
-                for (final TestCase innerTestCase : testSet) {
-                    if (innerTestCase.containsAll(testCase)) {
+                for (final int[] innerTestCase : testSet) {
+                    boolean match = true;
+                    for(final Pair pair : testCase) {
+                        if(innerTestCase[pair.i] != pair.j) {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if(match) {
                         isCaseCovered = true;
                         break;
                     }
                 }
 
-                if (isCaseCovered) {
-                    pi.remove(testCase);
+                if (!isCaseCovered) {
+                    final ListIterator<int[]> unboundIter = unbound.listIterator();
+                    boolean isMerged = false;
+                    int[] innerTestCase = null;
+                    while(unboundIter.hasNext()) {
+                        innerTestCase = unboundIter.next();
+                        // -1 => no merge, 0 perfect merge (no unbound), 1 partial merge
+                        final int mergeResult = merge(k, testCase, innerTestCase);
+                        if(mergeResult == 0) {
+                            unboundIter.remove();
+                            testSet.add(innerTestCase);
+                            isMerged = true;
+                            break;
+                        } else if(mergeResult == 1) {
+                            isMerged = true;
+                            break;
+                        }
+                    }
+
+                    if (!isMerged) {
+                        final int[] unboundTestCase = new int[pairCache.length];
+                        Arrays.fill(unboundTestCase, -1);
+                        for(final Pair pair : testCase) {
+                            unboundTestCase[pair.i] = pair.j;
+                        }
+                        unbound.add(unboundTestCase);
+                    }
+                }
+                piIter.remove();
+            }
+        }
+        return testSetToArray(testSet, unbound);
+    }
+
+    // -1 no merge, 0 perfect merge (no unbound), 1 partial merge
+    int merge(final int k, final Pair[] pairs, final int[] testCase) {
+        // verify merge
+        for(final Pair pair : pairs) {
+            int value = testCase[pair.i];
+            if(!(value == -1 || value == pair.j)) {
+                return -1;
+            }
+        }
+
+        for(int i = 0; i < mergeScratch.length; i++) {
+            mergeScratch[i] = testCase[i];
+        }
+
+        for(final Pair pair : pairs) {
+            mergeScratch[pair.i] = pair.j;
+        }
+
+        if(violateConstraints(mergeScratch)) {
+            return -1;
+        }
+
+        // merge
+        for(final Pair pair : pairs) {
+            testCase[pair.i] = pair.j;
+        }
+
+        // find unbound
+        for(int i = 0; i < k; i++) {
+            if(testCase[i] == -1) { return 1; }
+        }
+        return 0;
+    }
+
+    private Object[][] testSetToArray(final List<int[]> testSet, final List<int[]> unbound) {
+
+        final List<Object[]> results = new ArrayList<Object[]>(testSet.size() + unbound.size());
+        for(final int[] boundResult : testSet) {
+            final Object[] result = new Object[boundResult.length];
+            results.add(result);
+            for (int k = 0; k < boundResult.length; k++) {
+                final int value = boundResult[k];
+                final int i = origIndex.get(k);
+                result[i] = inputParams[i][value];
+            }
+        }
+
+outer:
+        for(final int[] unboundResult : unbound) {
+            final Object[] result = new Object[unboundResult.length];
+            for(int k = 0; k < unboundResult.length; k++) {
+                final int i = origIndex.get(k);
+                if(unboundResult[k] != -1) {
+                    final int value = unboundResult[k];
+                    result[i] = inputParams[i][value];
                     continue;
                 }
-
-                boolean isMerged = false;
-                for (final TestCase innerTestCase : testSet) {
-                    if (innerTestCase.mergeWithoutConflict(k, testCase) != null) {
-                        isMerged = true;
+                boolean flag = true;
+                for(int j = 0; j < pairCache[k].length; j++) {
+                    unboundResult[k] = j;
+                    if(!violateConstraints(unboundResult)) {
+                        flag = false;
                         break;
                     }
                 }
-
-                if (!isMerged) {
-                    testSet.add(testCase.createUnbound(k));
-                }
-                pi.remove(testCase);
-            }
-        }
-        return testSetToArray(testSet);
-    }
-
-    private Object[][] testSetToArray(final List<TestCase> testSet) {
-        final Object[][] results = new Object[testSet.size()][];
-        int size = 0;
-        for (int k = 0; k < testSet.size(); k++) {
-            final Object[] result = fillUnbound(testSet.get(k));
-            if (result == null) {
-                continue;
-            }
-            results[size] = result;
-            size++;
-        }
-        return Arrays.copyOf(results, size);
-    }
-
-    private Object[] fillUnbound(final TestCase testCase) {
-        final Object[] result = new Object[boundParams.length];
-        for (final Param param : testCase) {
-            if (param.isBound()) {
-                final int i = origIndex.get(param.i());
-                result[i] = inputParams[i][((BoundParam) param).j()];
-            }
-        }
-
-        TestCase innerTestCase = testCase;
-
-        for (int k = 0; k < result.length; k++) {
-            if (result[k] != null) {
-                continue;
-            }
-
-            final Object[] origParams = inputParams[k];
-            for (int h = 0; h < origParams.length; h++) {
-                final BoundParam innerParam = boundParams[inverseOrigIndex
-                        .get(k)][h];
-                testCase.add(innerParam);
-                if (testCase.hasAnyConstraint()) {
-                    testCase.remove(innerParam);
-                    continue;
+                if(flag) {
+                    continue outer;
                 } else {
-                    result[k] = origParams[h];
-                    break;
+                    final int value = unboundResult[k];
+                    result[i] = inputParams[i][value];
                 }
             }
-            if (result[k] == null) {
-                return null;
+            if(!hasTested(unboundResult)) {
+                results.add(result);
             }
         }
 
-        if (innerTestCase.hasAnyConstraint() || hasTested(innerTestCase)) {
-            return null;
-        }
-
-        return result;
+        return results.toArray(new Object[][]{});
     }
 
-    private Collection<TestCase> maximizeCoverage(final int i,
-            final TestCase testCase, final Collection<TestCase> pi) {
-        int currentMax = 0;
-        int currentJ = 0;
-        Collection<TestCase> currentMatches = Collections.emptyList();
-
-        for (int j = 0; j < boundParams[i].length; j++) {
-            final BoundParam currentParam = boundParams[i][j];
-            testCase.add(currentParam);
-
-            if (!testCase.hasAnyConstraint()) {
-                final List<TestCase> matches = new ArrayList<TestCase>();
-                for (final TestCase innerTestCase : pi) {
-                    if (testCase.containsAll(innerTestCase)) {
-                        matches.add(innerTestCase);
-                    }
+    boolean violateConstraints(final int[] testCase) {
+outer:
+        for(final Pair[] pairs : constraints) {
+            for(final Pair pair : pairs) {
+                final int value = testCase[pair.i];
+                if(value == -1 || value != pair.j) {
+                    continue outer;
                 }
-                final int count = matches.size();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private int maximizeCoverage(final int i,
+            final int[] testCase, final List<Pair[]> pi) {
+        int currentMax = -1;
+        int currentJ = 0;
+
+        for (int j = 0; j < pairCache[i].length; j++) {
+            // final BoundParam currentParam = boundParams[i][j];
+            final Pair currentPair = pairCache[i][j];
+            testCase[currentPair.i] = currentPair.j;
+
+            if (!violateConstraints(testCase)) {
+                int count = 0;
+outer:
+                for (final Pair[] innerTestCase : pi) {
+                    for(final Pair pair : innerTestCase) {
+                        if (testCase[pair.i] != pair.j) {
+                            continue outer;
+                        }
+                    }
+                    count++;
+                }
 
                 if (count > currentMax) {
                     currentMax = count;
                     currentJ = j;
-                    currentMatches = matches;
                 }
             }
-            testCase.remove(currentParam);
+            testCase[i] = -1;
         }
 
-        if (testCase.hasAnyConstraint()) {
-            return null;
+        if (currentMax == -1) {
+            return -1;
         }
 
-        testCase.add(boundParams[i][currentJ]);
-        return currentMatches;
+        final Pair pair = pairCache[i][currentJ];
+        testCase[pair.i] = pair.j;
+        return currentMax;
     }
 }
