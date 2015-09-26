@@ -275,7 +275,7 @@ iter:
     }
 
     // -1 no merge, 0 perfect merge (no unbound), 1 partial merge
-    int merge(final int k, final Pair[] pairs, final int[] testCase) {
+    public int merge(final int k, final Pair[] pairs, final int[] testCase) {
         // verify merge
         for(final Pair pair : pairs) {
             int value = testCase[pair.i];
