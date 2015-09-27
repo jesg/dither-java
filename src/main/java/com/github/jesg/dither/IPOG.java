@@ -265,7 +265,9 @@ iter:
                         for(final Pair pair : testCase) {
                             unboundTestCase[pair.i] = pair.j;
                         }
-                        unbound.add(unboundTestCase);
+                        if(!violateConstraints(unboundTestCase)) {
+                            unbound.add(unboundTestCase);
+                        }
                     }
                 }
                 piIter.remove();
@@ -313,11 +315,13 @@ iter:
         final List<Object[]> results = new ArrayList<Object[]>(testSet.size() + unbound.size());
         for(final int[] boundResult : testSet) {
             final Object[] result = new Object[boundResult.length];
-            results.add(result);
             for (int k = 0; k < boundResult.length; k++) {
                 final int value = boundResult[k];
                 final int i = origIndex.get(k);
                 result[i] = inputParams[i][value];
+            }
+            if(!violateConstraints(boundResult) && !hasTested(boundResult)) {
+                results.add(result);
             }
         }
 
@@ -374,7 +378,6 @@ outer:
         int currentJ = 0;
 
         for (int j = 0; j < pairCache[i].length; j++) {
-            // final BoundParam currentParam = boundParams[i][j];
             final Pair currentPair = pairCache[i][j];
             testCase[currentPair.i] = currentPair.j;
 
