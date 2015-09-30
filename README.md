@@ -40,7 +40,21 @@ Object[][] results3constraints = Dither.ipog(3, new Object[][] {
         new Object[] { 0, 1 },
         new Object[] { true, false },
         new Object[] { "cat", "dog", "bird" }},
-        new Integer[][]{  add previously tested example to README// constraints
+        new Integer[][]{
+			new Integer[]{null, null, 0, 1}}, // exclude true dog combination
+		new Object[][]{new Object[]{ 0, 0, true, "cat" }});  // previously tested cases
+
+
+// 3-way ATEG with constraints and exclude previously tested cases
+// ATEG is a non-deterministic pairwise strategy
+Object[][] resultsAteg = Dither.ateg(3,
+    0, // seed for random number generator, can be null
+    new Object[][] {
+		    new Object[] { 0, 1 },
+        new Object[] { 0, 1 },
+        new Object[] { true, false },
+        new Object[] { "cat", "dog", "bird" }},
+        new Integer[][]{
 			new Integer[]{null, null, 0, 1}}, // exclude true dog combination
 		new Object[][]{new Object[]{ 0, 0, true, "cat" }});  // previously tested cases
 ...
