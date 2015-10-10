@@ -30,7 +30,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-public class IPOGTest {
+public class IpogTest {
 
     @Before
     public void setUp() throws Exception {
@@ -53,7 +53,7 @@ public class IPOGTest {
 
     @Test
     public void canGetAllCombinations() {
-        IPOG ipog = new IPOG(new Object[][] { new Object[] { 1, 2 },
+        Ipog ipog = new Ipog(new Object[][] { new Object[] { 1, 2 },
                 new Object[] { 3, 4 } }, 2);
         List<int[]> testCases = ipog.allCombinations();
         assertArrayEquals(testCases.get(0), new int[]{0, 0});
@@ -62,7 +62,7 @@ public class IPOGTest {
 
     @Test
     public void canPerfectMerge() {
-        IPOG ipog = new IPOG(new Object[][] {
+        Ipog ipog = new Ipog(new Object[][] {
             new Object[] { 1, 2 },
             new Object[] { 3, 4 },
             new Object[] { 1, 2, 3}}, 2);
@@ -72,7 +72,7 @@ public class IPOGTest {
 
     @Test
     public void canPartialMerge() {
-        IPOG ipog = new IPOG(new Object[][] {
+        Ipog ipog = new Ipog(new Object[][] {
             new Object[] { 1, 2 },
             new Object[] { 3, 4 },
             new Object[] { 1, 2, 3}}, 2);
@@ -82,7 +82,7 @@ public class IPOGTest {
 
     @Test
     public void canDetectConstraintInMerge() {
-        IPOG ipog = new IPOG(new Object[][] {
+        Ipog ipog = new Ipog(new Object[][] {
             new Object[] { 1, 2 },
             new Object[] { 3, 4 },
             new Object[] { 1, 2, 3}}, 2, new Integer[][]{new Integer[] { 0, 0, 0}}, new Object[][]{});

@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
-class IPOG {
+class Ipog {
 
     private final int t;
     private final Object[][] inputParams;
@@ -39,11 +39,11 @@ class IPOG {
     private final Pair[][] pairCache;
     private final int[] mergeScratch;
 
-    public IPOG(final Object[][] input, final int t) {
+    public Ipog(final Object[][] input, final int t) {
         this(input, t, new Integer[][] {}, new Object[][] {});
     }
 
-    public IPOG(final Object[][] input, final int t,
+    public Ipog(final Object[][] input, final int t,
             final Integer[][] constraints, final Object[][] tested) {
         this.t = t;
         this.inputParams = input;

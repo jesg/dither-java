@@ -33,25 +33,25 @@ public class Dither {
     public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
             throws DitherError {
         validateInput(t, params);
-        return new IPOG(params, t, constraints, previouslyTested).run();
+        return new Ipog(params, t, constraints, previouslyTested).run();
     }
 
     public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints)
             throws DitherError {
         validateInput(t, params);
-        return new IPOG(params, t, constraints, EMPTY_PREVIOUSLY_TESTED).run();
+        return new Ipog(params, t, constraints, EMPTY_PREVIOUSLY_TESTED).run();
     }
 
     public static Object[][] ipog(final int t, final Object[][] params)
             throws DitherError {
         validateInput(t, params);
-        return new IPOG(params, t, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED).run();
+        return new Ipog(params, t, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED).run();
     }
 
     public static Object[][] ipog(final Object[][] params)
             throws DitherError {
         validateInput(2, params);
-        return new IPOG(params, 2, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED).run();
+        return new Ipog(params, 2, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED).run();
     }
 
     public static Object[][] ipog(final int t, final Object[] params, final Object[] constraints, final Object[] previouslyTested)
@@ -72,7 +72,7 @@ public class Dither {
             innerPerviouslyTested[i] = (Object[]) previouslyTested[i];
         }
 
-        return new IPOG(innerParams, t, innerConstraints, innerPerviouslyTested).run();
+        return new Ipog(innerParams, t, innerConstraints, innerPerviouslyTested).run();
     }
 
     @Deprecated
