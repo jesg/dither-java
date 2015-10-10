@@ -30,26 +30,26 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class AtegTest {
+public class AetgTest {
 
     @Test(expected = DitherError.class)
     public void tMustBeGreaterThan2() {
-        Dither.ateg(0, new Object[][]{});
+        Dither.aetg(0, new Object[][]{});
     }
 
     @Test(expected = DitherError.class)
     public void tMustBeGreaterThanParamLength() {
-        Dither.ateg(3, new Object[][] { new Object[] {} });
+        Dither.aetg(3, new Object[][] { new Object[] {} });
     }
 
     @Test(expected = DitherError.class)
     public void paramsLengthMustBeGreaterThan2() {
-        Dither.ateg(2, new Object[][] { new Object[] {}, new Object[] {} });
+        Dither.aetg(2, new Object[][] { new Object[] {}, new Object[] {} });
     }
 
     @Test
     public void canRunAteg() {
-        Object[][] result = Dither.ateg(
+        Object[][] result = Dither.aetg(
                 new Object[][] {
                     new Object[] { 1, 2 },
                     new Object[] { 3, 4 }
@@ -59,7 +59,7 @@ public class AtegTest {
 
     @Test
     public void canRunAteg2() {
-        Object[][] result = Dither.ateg(3,
+        Object[][] result = Dither.aetg(3,
                 new Object[][] {
                     new Object[] { 1, 2 },
                     new Object[] { 1, 2 },
@@ -79,7 +79,7 @@ public class AtegTest {
 
     @Test
     public void canCompute3WayAtegWithConstraintsAndPreviouslyTested() {
-        Object[][] results = Dither.ateg(3, 0, new Object[][] { new Object[] { 0, 1 },
+        Object[][] results = Dither.aetg(3, 0, new Object[][] { new Object[] { 0, 1 },
                 new Object[] { 0, 1 },
                 new Object[] { 0, 1, 2, 3 }},
                 new Integer[][]{ new Integer[]{0, null, 2}, new Integer[]{0, 1, 0}},
@@ -112,7 +112,7 @@ public class AtegTest {
 
     @Test
     public void anotherCompute3WayAtegWithConstraints() {
-        Object[][] results = Dither.ateg(3, 0, new Object[][] { new Object[] { 0, 1 },
+        Object[][] results = Dither.aetg(3, 0, new Object[][] { new Object[] { 0, 1 },
                 new Object[] { 0, 1 },
                 new Object[] { 0, 1 },
                 new Object[] { 0, 1, 2, 3 }},

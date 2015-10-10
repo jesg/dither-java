@@ -75,29 +75,51 @@ public class Dither {
         return new IPOG(innerParams, t, innerConstraints, innerPerviouslyTested).run();
     }
 
+    @Deprecated
     public static Object[][] ateg(final Object[][] params)
         throws DitherError {
-        return ateg(2, params);
+        return aetg(params);
     }
 
+    public static Object[][] aetg(final Object[][] params)
+        throws DitherError {
+        return aetg(2, params);
+    }
+
+    @Deprecated
     public static Object[][] ateg(final int t, final Object[][] params) {
-        return ateg(t, null, params, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED);
+        return aetg(t, params);
     }
 
+    public static Object[][] aetg(final int t, final Object[][] params) {
+        return aetg(t, null, params, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED);
+    }
+
+    @Deprecated
     public static Object[][] ateg(final int t, final Integer seed, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
+        throws DitherError {
+        return aetg(t, seed, params, constraints, previouslyTested);
+    }
+
+    public static Object[][] aetg(final int t, final Integer seed, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
         throws DitherError {
         validateInput(t, params);
         final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Object[][] result = new Object[][]{};
         try {
-            result = new AtegPairwise(t, seed, params, constraints, previouslyTested, executor).toArray();
+            result = new AetgPairwise(t, seed, params, constraints, previouslyTested, executor).toArray();
         } finally {
             executor.shutdownNow();
         }
         return result;
     }
 
+    @Deprecated
     public static Object[][] ateg(final int t, final Integer seed, final Object[] params, final Object[] constraints, final Object[] previouslyTested) {
+        return aetg(t, seed, params, constraints, previouslyTested);
+    }
+
+    public static Object[][] aetg(final int t, final Integer seed, final Object[] params, final Object[] constraints, final Object[] previouslyTested) {
         final Object[][] innerParams = new Object[params.length][];
         for(int i = 0; i < innerParams.length; i++) {
             innerParams[i] = (Object[]) params[i];
@@ -113,7 +135,7 @@ public class Dither {
         for(int i = 0; i < innerPerviouslyTested.length; i++) {
             innerPerviouslyTested[i] = (Object[]) previouslyTested[i];
         }
-		return ateg(t, seed, innerParams, innerConstraints, innerPerviouslyTested);
+		return aetg(t, seed, innerParams, innerConstraints, innerPerviouslyTested);
 	}
 
     private static void validateInput(final int t, final Object[][] params) throws DitherError {

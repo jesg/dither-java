@@ -30,7 +30,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * #L%
  True*/
 
-class AtegPairwise extends Ateg {
+class AetgPairwise extends Aetg {
 
     private final int n = 50;
     private final int[][] scratch = new int[n][];
@@ -44,7 +44,7 @@ class AtegPairwise extends Ateg {
     private final List<Callable<Void>> tasks = new ArrayList<Callable<Void>>(n);
     private final Pair[][] constraints;
 
-    public AtegPairwise(final int t, final Integer seed, final Object[][] params, final Integer[][] constraintsParam, final Object[][] previouslyTested, final ExecutorService executor) {
+    public AetgPairwise(final int t, final Integer seed, final Object[][] params, final Integer[][] constraintsParam, final Object[][] previouslyTested, final ExecutorService executor) {
         this.params = params;
         this.executor = executor;
         this.barrier = new Semaphore(0);

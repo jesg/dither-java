@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class Ateg implements Iterator<Object[]> {
+public abstract class Aetg implements Iterator<Object[]> {
 
     public abstract boolean hasNext();
     public abstract Object[] next();
