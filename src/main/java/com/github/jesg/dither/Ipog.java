@@ -226,17 +226,38 @@ iter:
             while (piIter.hasNext()) {
                 final Pair[] testCase = piIter.next();
                 boolean isCaseCovered = false;
-                for (final int[] innerTestCase : testSet) {
-                    boolean match = true;
-                    for(final Pair pair : testCase) {
-                        if(innerTestCase[pair.i] != pair.j) {
-                            match = false;
-                            break;
+                // remove constraint violation
+                for(final Pair[] constraint : constraints) {
+                    if(constraint.length > testCase.length) {
+                        continue;
+                    }
+                    int count = 0;
+                    for(final Pair pair : constraint) {
+                        for(final Pair innerCombPair : testCase) {
+                            if(pair.equals(innerCombPair)) {
+                                count++;
+                                break;
+                            }
                         }
                     }
-                    if(match) {
+                    if(count == constraint.length) {
                         isCaseCovered = true;
                         break;
+                    }
+                }
+                if(!isCaseCovered) {
+                    for (final int[] innerTestCase : testSet) {
+                        boolean match = true;
+                        for(final Pair pair : testCase) {
+                            if(innerTestCase[pair.i] != pair.j) {
+                                match = false;
+                                break;
+                            }
+                        }
+                        if(match) {
+                            isCaseCovered = true;
+                            break;
+                        }
                     }
                 }
 
@@ -328,6 +349,8 @@ iter:
 outer:
         for(final int[] unboundResult : unbound) {
             final Object[] result = new Object[unboundResult.length];
+            // TODO need real constraint solver
+            // try to satisfy constraints via greedy approach
             for(int k = 0; k < unboundResult.length; k++) {
                 final int i = origIndex.get(k);
                 if(unboundResult[k] != -1) {
@@ -344,6 +367,7 @@ outer:
                     }
                 }
                 if(flag) {
+                    System.err.println("WARNING: " + Arrays.toString(result) + " violated constraint");
                     continue outer;
                 } else {
                     final int value = unboundResult[k];
