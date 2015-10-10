@@ -8,7 +8,7 @@ Dither is in the Maven Central Repository.
 <dependency>
 	<groupId>com.github.jesg</groupId>
 	<artifactId>dither</artifactId>
-	<version>0.0.4</version>
+	<version>0.1.1</version>
 	<scope>test</scope>
 </dependency>
 ```
@@ -45,9 +45,9 @@ Object[][] results3constraints = Dither.ipog(3, new Object[][] {
 		new Object[][]{new Object[]{ 0, 0, true, "cat" }});  // previously tested cases
 
 
-// 3-way ATEG with constraints and exclude previously tested cases
-// ATEG is a non-deterministic pairwise strategy
-Object[][] resultsAteg = Dither.ateg(3,
+// 3-way AETG with constraints and exclude previously tested cases
+// AETG is a non-deterministic pairwise strategy
+Object[][] resultsAetg = Dither.aetg(3,
     0, // seed for random number generator, can be null
     new Object[][] {
 		    new Object[] { 0, 1 },
