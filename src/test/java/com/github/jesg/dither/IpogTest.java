@@ -135,7 +135,6 @@ public class IpogTest {
 
     @Test
     public void anotherCompute3WayIPOGWithConstraints() {
-        System.out.println("begin");
         Object[][] results = Dither.ipog(3, new Object[][] { new Object[] { 0, 1 },
                 new Object[] { 0, 1 },
                 new Object[] { 0, 1 },
