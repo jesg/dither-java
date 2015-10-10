@@ -202,6 +202,11 @@ outer:
 
     private void fitness(final int i) {
         final int[] cases = scratch[i];
+        if(constraints.length > 0) {
+            for(final Pair pair : coverage.get(0)) {
+                cases[pair.i] = pair.j;
+            }
+        }
         for(final Pair[] constraint : constraints) {
             int count = 0;
             for(final Pair pair : constraint) {
