@@ -38,6 +38,7 @@ class Ipog {
     private final int[][] previouslyTested;
     private final Pair[][] pairCache;
     private final int[] mergeScratch;
+    private final ConstraintHandler constraintHandler;
 
     public Ipog(final Object[][] input, final int t) {
         this(input, t, new Integer[][] {}, new Object[][] {});
@@ -92,6 +93,11 @@ class Ipog {
             }
             this.constraints[i] = tmpConstraint.toArray(new Pair[]{});
         }
+        final int[] bounds = new int[pairCache.length];
+        for(int i = 0; i < bounds.length; i++) {
+            bounds[i] = pairCache[i].length;
+        }
+        this.constraintHandler = new ConstraintHandler(this.constraints, bounds);
     }
 
     List<int[]> allCombinations() {
@@ -225,26 +231,8 @@ iter:
             final ListIterator<Pair[]> piIter = pi.listIterator();
             while (piIter.hasNext()) {
                 final Pair[] testCase = piIter.next();
-                boolean isCaseCovered = false;
                 // remove constraint violation
-                for(final Pair[] constraint : constraints) {
-                    if(constraint.length > testCase.length) {
-                        continue;
-                    }
-                    int count = 0;
-                    for(final Pair pair : constraint) {
-                        for(final Pair innerCombPair : testCase) {
-                            if(pair.equals(innerCombPair)) {
-                                count++;
-                                break;
-                            }
-                        }
-                    }
-                    if(count == constraint.length) {
-                        isCaseCovered = true;
-                        break;
-                    }
-                }
+                boolean isCaseCovered = violateConstraints(testCase);
                 if(!isCaseCovered) {
                     for (final int[] innerTestCase : testSet) {
                         boolean match = true;
@@ -351,28 +339,15 @@ outer:
             final Object[] result = new Object[unboundResult.length];
             // TODO need real constraint solver
             // try to satisfy constraints via greedy approach
+            // solve for unbound
+            final int[] groundResult = constraintHandler.groundSolution(unboundResult);
+            if(groundResult == null) {
+                continue outer;
+            }
             for(int k = 0; k < unboundResult.length; k++) {
                 final int i = origIndex.get(k);
-                if(unboundResult[k] != -1) {
-                    final int value = unboundResult[k];
-                    result[i] = inputParams[i][value];
-                    continue;
-                }
-                boolean flag = true;
-                for(int j = 0; j < pairCache[k].length; j++) {
-                    unboundResult[k] = j;
-                    if(!violateConstraints(unboundResult)) {
-                        flag = false;
-                        break;
-                    }
-                }
-                if(flag) {
-                    System.err.println("WARNING: " + Arrays.toString(result) + " violated constraint");
-                    continue outer;
-                } else {
-                    final int value = unboundResult[k];
-                    result[i] = inputParams[i][value];
-                }
+                final int value = unboundResult[k];
+                result[i] = inputParams[i][value];
             }
             if(!hasTested(unboundResult)) {
                 results.add(result);
@@ -383,17 +358,17 @@ outer:
     }
 
     boolean violateConstraints(final int[] testCase) {
-outer:
-        for(final Pair[] pairs : constraints) {
-            for(final Pair pair : pairs) {
-                final int value = testCase[pair.i];
-                if(value == -1 || value != pair.j) {
-                    continue outer;
-                }
-            }
-            return true;
+        if(constraints.length == 0) {
+            return false;
         }
-        return false;
+        return constraintHandler.violateConstraints(testCase);
+    }
+
+    boolean violateConstraints(final Pair[] testCase) {
+        if(constraints.length == 0) {
+            return false;
+        }
+        return constraintHandler.violateConstraints(testCase);
     }
 
     private int maximizeCoverage(final int i,
