@@ -70,6 +70,18 @@ Object[][] resultsAetg = Dither.aetg(3,
   (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches
 
+# Dependencies
+
+Dither requires JDK 8+.  Constraints are handled by choco a library for constraint programming.
+```
+dk.brics.automaton:automaton:jar:1.11-8
+args4j:args4j:jar:2.32
+org.choco-solver:choco-solver:jar:3.3.1
+org.javabits.jgrapht:jgrapht-core:jar:0.9.3
+net.sf.trove4j:trove4j:jar:3.0.3
+org.slf4j:slf4j-api:jar:1.7.12
+```
+
 # Copyright
 
 Apache License, Version 2.0
