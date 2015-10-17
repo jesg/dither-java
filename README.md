@@ -8,7 +8,7 @@ Dither is in the Maven Central Repository.
 <dependency>
 	<groupId>com.github.jesg</groupId>
 	<artifactId>dither</artifactId>
-	<version>0.1.1</version>
+	<version>0.1.2</version>
 	<scope>test</scope>
 </dependency>
 ```
