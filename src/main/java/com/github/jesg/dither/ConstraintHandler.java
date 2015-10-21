@@ -39,7 +39,10 @@ class ConstraintHandler {
 
     ConstraintHandler(final Pair[][] constraints, final int[] bounds) {
         this.constraints = constraints;
-        this.bounds = bounds;
+        this.bounds = new int[bounds.length];
+        for(int i = 0; i < bounds.length; i++) {
+            this.bounds[i] = bounds[i] - 1;
+        }
     }
 
     boolean violateConstraints(final int[] solution) {

@@ -171,6 +171,7 @@ public class IpogTest {
         }
     }
 
+    // github issue #2
     @Test
     public void potentialArrayIndexOutOfBoundError() {
         Dither.ipog(3, new Object[][] {

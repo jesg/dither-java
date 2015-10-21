@@ -337,16 +337,13 @@ iter:
 outer:
         for(final int[] unboundResult : unbound) {
             final Object[] result = new Object[unboundResult.length];
-            // TODO need real constraint solver
-            // try to satisfy constraints via greedy approach
-            // solve for unbound
             final int[] groundResult = constraintHandler.groundSolution(unboundResult);
             if(groundResult == null) {
                 continue outer;
             }
             for(int k = 0; k < unboundResult.length; k++) {
                 final int i = origIndex.get(k);
-                final int value = unboundResult[k];
+                final int value = groundResult[k];
                 result[i] = inputParams[i][value];
             }
             if(!hasTested(unboundResult)) {
