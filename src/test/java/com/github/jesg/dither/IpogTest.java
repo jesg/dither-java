@@ -170,4 +170,20 @@ public class IpogTest {
             assertTrue("expected " + expectedResult, actuals.contains(expectedResult));
         }
     }
+
+    @Test
+    public void potentialArrayIndexOutOfBoundError() {
+        Dither.ipog(3, new Object[][] {
+            new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1, 2 },
+                new Object[] { 0, 1, 2, 3 }},
+                new Integer[][]{
+                    new Integer[]{0, 1, 0, null, null},
+                    new Integer[]{0, 1, null, null, null},
+                    new Integer[]{1, 1, null, null, null},
+                    new Integer[]{0, null, null, null, 3},
+                });
+    }
 }
