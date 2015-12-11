@@ -83,9 +83,10 @@ class ConstraintHandler {
         final IntVar[] boundVars = new IntVar[solution.length];
 
         for(int i = 0; i < solution.length; i++) {
-            boundVars[i] = VariableFactory.bounded("param-"+Integer.toString(i), 0, bounds[i], innerSolver);
-            if(solution[i] != -1) {
-                innerSolver.post(IntConstraintFactory.arithm(boundVars[i], "=", solution[i]));
+            if(solution[i] == -1) {
+                boundVars[i] = VariableFactory.bounded("param-"+Integer.toString(i), 0, bounds[i], innerSolver);
+            } else {
+                boundVars[i] = VariableFactory.fixed("param-"+Integer.toString(i), solution[i], innerSolver);
             }
         }
 
