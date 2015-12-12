@@ -80,12 +80,40 @@ class CombinatoricHelper {
         return results;
     }
 
-    public static int[][] product(final int[] input) {
-        int[][] result = _product(input[0], input[1]);
-        for (int i = 2; i < input.length; i++) {
-            result = _product(result, input[i]);
+    public static int[][] product(final int[] ranges) {
+        int length = 1;
+        for(int i = 0; i < ranges.length; i++) {
+            length *= ranges[i];
+            --ranges[i];
         }
-        return result;
+
+        final int[][] results = new int[length][ranges.length];
+        final int[] scratch = new int[ranges.length];
+
+        int k = 0;
+        final int max = ranges.length - 1;
+        for(int i = max;;) {
+
+            if(i == max) {
+                for(int val = 0; val <= ranges[i]; val++) {
+                    for(int j = 0; j < scratch.length; j++) {
+                        results[k][j] = scratch[j];
+                    }
+                    k++;
+                    scratch[i]++;
+                }
+                scratch[i] = 0;
+                i--;
+            } else if(i == 0 && scratch[i] >= ranges[i]) {
+                return results;
+            } else if(scratch[i] < ranges[i]) {
+                scratch[i]++;
+                i++;
+            } else {
+                scratch[i] = -1;
+                i--;
+            }
+        }
     }
 
     private static int[][] _product(final int left, final int right) {
