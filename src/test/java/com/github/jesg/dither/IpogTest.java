@@ -187,4 +187,26 @@ public class IpogTest {
                     new Integer[]{0, null, null, null, 3},
                 });
     }
+
+    @Test
+    public void tcas() {
+        Object[][] results = Dither.ipog(3, new Object[][] {
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1 },
+                new Object[] { 0, 1, 2 },
+                new Object[] { 0, 1, 2 },
+                new Object[] { 0, 1, 2 },
+                new Object[] { 0, 1, 2, 3 },
+                new Object[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+                new Object[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }
+        }
+                );
+        System.out.println(results.length);
+    }
 }
