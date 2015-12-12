@@ -111,11 +111,8 @@ class Ipog {
 
         final List<int[]> results = new LinkedList<int[]>();
         for(int i = 0; i < prodArrResult.length; i++) {
-            final int[] result = new int[pairCache.length];
-            Arrays.fill(result, (t-1), result.length, -1);
-            for(int k = 0; k < t; k++) {
-                result[k] = prodArrResult[i][k];
-            }
+            final int[] result = Arrays.copyOf(prodArrResult[i], pairCache.length);
+            Arrays.fill(result, t, result.length, -1);
             if(!hasTested(t, result)) {
                 results.add(result);
             }
