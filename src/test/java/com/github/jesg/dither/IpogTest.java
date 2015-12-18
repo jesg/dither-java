@@ -21,6 +21,7 @@ package com.github.jesg.dither;
  */
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -141,33 +142,8 @@ public class IpogTest {
                 new Object[] { 0, 1, 2, 3 }},
                 new Integer[][]{ new Integer[]{0, 1, 0}});
 
-        Set<List<Object>> actuals = new HashSet<List<Object>>();
         for(Object[] result : results) {
-            actuals.add(Arrays.asList(result));
-        }
-
-        List<List<Integer>> expected = Arrays.asList(
-                Arrays.asList(0, 0, 0, 0),
-                Arrays.asList(1, 1, 0, 0),
-                Arrays.asList(1, 0, 1, 0),
-                Arrays.asList(0, 1, 1, 0),
-                Arrays.asList(1, 0, 0, 1),
-                Arrays.asList(1, 1, 0, 1),
-                Arrays.asList(0, 0, 1, 1),
-                Arrays.asList(1, 1, 1, 1),
-                Arrays.asList(0, 0, 0, 2),
-                Arrays.asList(1, 1, 0, 2),
-                Arrays.asList(1, 0, 1, 2),
-                Arrays.asList(0, 1, 1, 2),
-                Arrays.asList(0, 0, 0, 3),
-                Arrays.asList(1, 1, 0, 3),
-                Arrays.asList(1, 0, 1, 3),
-                Arrays.asList(0, 1, 1, 3),
-                Arrays.asList(0, 0, 0, 1),
-                Arrays.asList(0, 1, 1, 1));
-
-        for(List expectedResult : expected) {
-            assertTrue("expected " + expectedResult, actuals.contains(expectedResult));
+            assertFalse("0, 1, 0 occured", ((Integer)result[0]) == 0 && ((Integer)result[1]) == 1 && ((Integer)result[2]) == 0);
         }
     }
 

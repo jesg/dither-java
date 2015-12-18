@@ -38,88 +38,93 @@ class ConstraintHandler {
 
     private final Pair[][] constraints;
     private final int[] bounds;
+    private final int[] scratch;
 
     ConstraintHandler(final Pair[][] constraints, final int[] bounds) {
         this.constraints = constraints;
         this.bounds = new int[bounds.length];
+        this.scratch = new int[bounds.length];
         for(int i = 0; i < bounds.length; i++) {
             this.bounds[i] = bounds[i] - 1;
         }
+        Arrays.fill(scratch, -1);
         Arrays.sort(this.constraints, new Comparator<Pair[]>() {
             public int compare(final Pair[] a, final Pair[] b) { return a.length - b.length; }
         });
     }
 
+    boolean violateConstraints_(final int[] testCase) {
+outer:
+        for(final Pair[] pairs : constraints) {
+            for(final Pair pair : pairs) {
+                final int value = testCase[pair.i];
+                if(value == -1 || value != pair.j) {
+                    continue outer;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
     boolean violateConstraints(final int[] solution) {
-        return !createSolver(solution).solver.findSolution();
+        if(violateConstraints_(solution)) {
+            return true;
+        }
+        for(int i = 0; i < solution.length; i++) {
+            scratch[i] = solution[i];
+        }
+        return groundSolution(scratch) == null;
     }
 
     boolean violateConstraints(final Pair[] pairs) {
-        final int[] solution = new int[bounds.length];
-        Arrays.fill(solution, -1);
+        Arrays.fill(scratch, -1);
         for(int i = 0; i < pairs.length; i++) {
             final Pair pair = pairs[i];
-            solution[pair.i] = pair.j;
+            scratch[pair.i] = pair.j;
         }
-        return violateConstraints(solution);
+        if(violateConstraints_(scratch)) {
+            return true;
+        }
+        return groundSolution(scratch) == null;
     }
 
     // return null if unable to find a solution
     int[] groundSolution(final int[] solution) {
-        final SolverTuple solverTuple = createSolver(solution);
-        final Solver solver = solverTuple.solver;
-        if(!solver.findSolution()) {
-            return null;
-        }
-
-        final Solution chocoSolution = solver.getSolutionRecorder().getLastSolution();
+        final int[] indexes = new int[solution.length];
+        int last_index = 0;
         for(int i = 0; i < solution.length; i++) {
             if(solution[i] == -1) {
-                solution[i] = chocoSolution.getIntVal(solverTuple.boundVars[i]);
+                indexes[last_index] = i;
+                ++last_index;
             }
         }
+        final int[] bound_values = new int[last_index + 1];
+        Arrays.fill(bound_values, -1);
+        int i = 0;
 
+outer:
+        while(i < bound_values.length) {
+            final int max = bounds[indexes[i]];
+            for(int value = bound_values[i] + 1; value <= max; value++) {
+                solution[indexes[i]] = value;
+                if(violateConstraints_(solution)) {
+                    continue;
+                }
+                bound_values[i] = value;
+                ++i;
+                continue outer;
+            }
+
+            if(i == 0) {
+                return null;
+            }
+
+            // unwind
+            bound_values[i] = -1;
+            solution[i] = -1;
+            --i;
+        }
         return solution;
     }
-
-    // TODO can we reuse the solver object?
-    private SolverTuple createSolver(final int[] solution) {
-        final Solver innerSolver = new Solver();
-        final IntVar[] boundVars = new IntVar[solution.length];
-
-        for(int i = 0; i < solution.length; i++) {
-            if(solution[i] == -1) {
-                boundVars[i] = VariableFactory.bounded("param-"+Integer.toString(i), 0, bounds[i], innerSolver);
-            } else {
-                boundVars[i] = VariableFactory.fixed("param-"+Integer.toString(i), solution[i], innerSolver);
-            }
-        }
-
-        for(final Pair[] constraint : constraints) {
-            final Constraint[] innerConstraints = new Constraint[constraint.length];
-
-            for(int i = 0; i < constraint.length; i++) {
-                final Pair pair = constraint[i];
-                innerConstraints[i] = IntConstraintFactory.arithm(boundVars[pair.i], "=", pair.j);
-            }
-
-            // not an efficient logical expression
-            innerSolver.post(LogicalConstraintFactory.not(LogicalConstraintFactory.and(innerConstraints)));
-        }
-
-        innerSolver.set(IntStrategyFactory.lexico_LB(boundVars));
-        return new SolverTuple(innerSolver, boundVars);
-    }
-
-    private static class SolverTuple {
-
-        final Solver solver;
-        final IntVar[] boundVars;
-
-        SolverTuple(final Solver solver, final IntVar[] boundVars) {
-            this.solver = solver;
-            this.boundVars = boundVars;
-        }
-    }
-
 }
