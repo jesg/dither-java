@@ -31,6 +31,8 @@ import org.chocosolver.solver.search.solution.Solution;
  * #L%
  */
 
+import java.util.Comparator;
+import static java.util.Arrays.*;
 
 class ConstraintHandler {
 
@@ -43,6 +45,9 @@ class ConstraintHandler {
         for(int i = 0; i < bounds.length; i++) {
             this.bounds[i] = bounds[i] - 1;
         }
+        Arrays.sort(this.constraints, new Comparator<Pair[]>() {
+            public int compare(final Pair[] a, final Pair[] b) { return a.length - b.length; }
+        });
     }
 
     boolean violateConstraints(final int[] solution) {
