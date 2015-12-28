@@ -112,7 +112,7 @@ outer:
 
             // unwind
             bound_values[i] = -1;
-            solution[i] = -1;
+            solution[indexes[i]] = -1;
             --i;
         }
         return solution;
