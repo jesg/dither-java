@@ -245,21 +245,17 @@ match_unbound_label:
                 }
 
                 if (!isCaseCovered) {
-                    final ListIterator<int[]> unboundIter = unbound.listIterator();
                     boolean isMerged = false;
-                    int[] innerTestCase = null;
-                    while(unboundIter.hasNext()) {
-                        innerTestCase = unboundIter.next();
+                    for(final int[] innerTestCase : unbound) {
                         // -1 => no merge, 0 perfect merge (no unbound), 1 partial merge
                         final int mergeResult = merge(k, testCase, innerTestCase);
-                        if(mergeResult == 0) {
-                            unboundIter.remove();
-                            testSet.add(innerTestCase);
+                        if(mergeResult > 0){
+                            for(final Pair localComb : testCase) {
+                                innerTestCase[localComb.i] = localComb.j;
+                            }
                             isMerged = true;
                             break;
-                        } else if(mergeResult == 1) {
-                            isMerged = true;
-                            break;
+
                         }
                     }
 
@@ -300,11 +296,6 @@ match_unbound_label:
 
         if(violateConstraints(mergeScratch)) {
             return -1;
-        }
-
-        // merge
-        for(final Pair pair : pairs) {
-            testCase[pair.i] = pair.j;
         }
 
         // find unbound
