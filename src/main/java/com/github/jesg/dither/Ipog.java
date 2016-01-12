@@ -231,18 +231,16 @@ iter:
                 // remove constraint violation
                 boolean isCaseCovered = violateConstraints(testCase);
                 if(!isCaseCovered) {
-                    for (final int[] innerTestCase : testSet) {
-                        boolean match = true;
+
+match_unbound_label:
+                    for (final int[] innerTestCase : unbound) {
                         for(final Pair pair : testCase) {
                             if(innerTestCase[pair.i] != pair.j) {
-                                match = false;
-                                break;
+                                continue match_unbound_label;
                             }
                         }
-                        if(match) {
-                            isCaseCovered = true;
-                            break;
-                        }
+                        isCaseCovered = true;
+                        break;
                     }
                 }
 
