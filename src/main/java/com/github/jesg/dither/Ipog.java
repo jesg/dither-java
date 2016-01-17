@@ -300,7 +300,7 @@ match_unbound_label:
 
         // find unbound
         for(int i = 0; i < k; i++) {
-            if(testCase[i] == -1) { return 1; }
+            if(mergeScratch[i] == -1) { return 1; }
         }
         return 0;
     }
