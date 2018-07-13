@@ -91,6 +91,7 @@ public class AetgTest {
             actuals.add(Arrays.asList(result));
         }
 
+        @SuppressWarnings("unchecked")
         List<List<Integer>> expected = Arrays.asList(
                 Arrays.asList(1, 0, 0),
                 Arrays.asList(1, 1, 0),
