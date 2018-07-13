@@ -130,7 +130,7 @@ public class IpogTest {
                 Arrays.asList(0, 1, 3),
                 Arrays.asList(1, 1, 3));
 
-        for(List expectedResult : expected) {
+        for(List<Integer> expectedResult : expected) {
             assertTrue("expected " + expectedResult, actuals.contains(expectedResult));
         }
     }
