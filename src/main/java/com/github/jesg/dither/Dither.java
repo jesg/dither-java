@@ -67,12 +67,12 @@ public class Dither {
             innerConstraints[i] = (Integer[]) constraints[i];
         }
 
-        final Object[][] innerPerviouslyTested = new Object[previouslyTested.length][];
-        for(int i = 0; i < innerPerviouslyTested.length; i++) {
-            innerPerviouslyTested[i] = (Object[]) previouslyTested[i];
+        final Object[][] innerPreviouslyTested = new Object[previouslyTested.length][];
+        for(int i = 0; i < innerPreviouslyTested.length; i++) {
+            innerPreviouslyTested[i] = (Object[]) previouslyTested[i];
         }
 
-        return new Ipog(innerParams, t, innerConstraints, innerPerviouslyTested).run();
+        return new Ipog(innerParams, t, innerConstraints, innerPreviouslyTested).run();
     }
 
     @Deprecated
@@ -131,11 +131,11 @@ public class Dither {
             innerConstraints[i] = (Integer[]) constraints[i];
         }
 
-        final Object[][] innerPerviouslyTested = new Object[previouslyTested.length][];
-        for(int i = 0; i < innerPerviouslyTested.length; i++) {
-            innerPerviouslyTested[i] = (Object[]) previouslyTested[i];
+        final Object[][] innerPreviouslyTested = new Object[previouslyTested.length][];
+        for(int i = 0; i < innerPreviouslyTested.length; i++) {
+            innerPreviouslyTested[i] = (Object[]) previouslyTested[i];
         }
-		return aetg(t, seed, innerParams, innerConstraints, innerPerviouslyTested);
+		return aetg(t, seed, innerParams, innerConstraints, innerPreviouslyTested);
 	}
 
     private static void validateInput(final int t, final Object[][] params) throws DitherError {
