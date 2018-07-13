@@ -28,6 +28,8 @@ public class Dither {
     public static final Integer[][] EMPTY_CONSTRAINTS = new Integer[][]{};
     public static final Object[][] EMPTY_PREVIOUSLY_TESTED = new Object[][]{};
 
+    private Dither() {}
+
     public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
             throws DitherError {
         validateInput(t, params);
