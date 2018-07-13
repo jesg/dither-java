@@ -46,7 +46,8 @@ import java.util.concurrent.Executors;
  *
  * <p>
  * For all methods, the coverage strength {@code t} between 2 and the number of parameters,
- * inclusive. Each parameter must have at least two values.
+ * inclusive. Each parameter must have at least two values. All methods throw
+ * {@link IllegalArgumentException} if these conditions are not satisfied.
  */
 public class Dither {
 
@@ -70,11 +71,8 @@ public class Dither {
      * @param constraints the constraints
      * @param previouslyTested the previously tested configurations
      * @return the tests
-     *
-     * @throws DitherError if inputs are not valid
      */
-    public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
-            throws DitherError {
+    public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested) {
         validateInput(t, params);
         return new Ipog(params, t, constraints, previouslyTested).run();
     }
@@ -86,11 +84,8 @@ public class Dither {
      * @param params the parameters
      * @param constraints the constraints
      * @return the tests
-     *
-     * @throws DitherError if inputs are not valid
      */
-    public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints)
-            throws DitherError {
+    public static Object[][] ipog(final int t, final Object[][] params, final Integer[][] constraints) {
         validateInput(t, params);
         return new Ipog(params, t, constraints, EMPTY_PREVIOUSLY_TESTED).run();
     }
@@ -102,11 +97,8 @@ public class Dither {
      * @param t the coverage strength
      * @param params the parameters
      * @return the tests
-     *
-     * @throws DitherError if inputs are not valid
      */
-    public static Object[][] ipog(final int t, final Object[][] params)
-            throws DitherError {
+    public static Object[][] ipog(final int t, final Object[][] params) {
         validateInput(t, params);
         return new Ipog(params, t, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED).run();
     }
@@ -117,11 +109,8 @@ public class Dither {
      *
      * @param params the parameters
      * @return the tests
-     *
-     * @throws DitherError if inputs are not valid
      */
-    public static Object[][] ipog(final Object[][] params)
-            throws DitherError {
+    public static Object[][] ipog(final Object[][] params) {
         validateInput(2, params);
         return new Ipog(params, 2, EMPTY_CONSTRAINTS, EMPTY_PREVIOUSLY_TESTED).run();
     }
@@ -134,11 +123,8 @@ public class Dither {
      * @param constraints the constraints; each element must be an {@code Integer[]}
      * @param previouslyTested the previously tested tests; each element must be an {@code Object[]}
      * @return the tests
-     *
-     * @throws DitherError if inputs are not valid
      */
-    public static Object[][] ipog(final int t, final Object[] params, final Object[] constraints, final Object[] previouslyTested)
-        throws DitherError {
+    public static Object[][] ipog(final int t, final Object[] params, final Object[] constraints, final Object[] previouslyTested) {
         final Object[][] innerParams = new Object[params.length][];
         for(int i = 0; i < innerParams.length; i++) {
             innerParams[i] = (Object[]) params[i];
@@ -159,13 +145,11 @@ public class Dither {
     }
 
     @Deprecated
-    public static Object[][] ateg(final Object[][] params)
-        throws DitherError {
+    public static Object[][] ateg(final Object[][] params) {
         return aetg(params);
     }
 
-    public static Object[][] aetg(final Object[][] params)
-        throws DitherError {
+    public static Object[][] aetg(final Object[][] params) {
         return aetg(2, params);
     }
 
@@ -179,13 +163,11 @@ public class Dither {
     }
 
     @Deprecated
-    public static Object[][] ateg(final int t, final Integer seed, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
-        throws DitherError {
+    public static Object[][] ateg(final int t, final Integer seed, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested) {
         return aetg(t, seed, params, constraints, previouslyTested);
     }
 
-    public static Object[][] aetg(final int t, final Integer seed, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested)
-        throws DitherError {
+    public static Object[][] aetg(final int t, final Integer seed, final Object[][] params, final Integer[][] constraints, final Object[][] previouslyTested) {
         validateInput(t, params);
         final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Object[][] result = new Object[][]{};
@@ -221,17 +203,17 @@ public class Dither {
 		return aetg(t, seed, innerParams, innerConstraints, innerPreviouslyTested);
 	}
 
-    private static void validateInput(final int t, final Object[][] params) throws DitherError {
+    private static void validateInput(final int t, final Object[][] params) {
         if (t <= 1) {
-            throw new DitherError("t must be >= 2");
+            throw new IllegalArgumentException("t must be >= 2: "+t);
         }
 
         if (t > params.length) {
-            throw new DitherError("t must be <= params.length");
+            throw new IllegalArgumentException("t must be <= params.length: t="+t+"; params.length="+params.length);
         }
         for (final Object[] param : params) {
             if (param.length < 2) {
-                throw new DitherError("param length must be > 1");
+                throw new IllegalArgumentException("param length must be > 1: "+param.length);
             }
         }
     }

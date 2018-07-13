@@ -37,17 +37,17 @@ public class IpogTest {
     public void setUp() throws Exception {
     }
 
-    @Test(expected = DitherError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void tMustBeGreaterThan2() {
         Dither.ipog(0, new Object[][] {});
     }
 
-    @Test(expected = DitherError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void tMustBeGreaterThanParamLength() {
         Dither.ipog(3, new Object[][] { new Object[] {} });
     }
 
-    @Test(expected = DitherError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void paramsLengthMustBeGreaterThan2() {
         Dither.ipog(new Object[][] { new Object[] {}, new Object[] {} });
     }

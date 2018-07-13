@@ -32,17 +32,17 @@ import org.junit.Test;
 
 public class AetgTest {
 
-    @Test(expected = DitherError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void tMustBeGreaterThan2() {
         Dither.aetg(0, new Object[][]{});
     }
 
-    @Test(expected = DitherError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void tMustBeGreaterThanParamLength() {
         Dither.aetg(3, new Object[][] { new Object[] {} });
     }
 
-    @Test(expected = DitherError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void paramsLengthMustBeGreaterThan2() {
         Dither.aetg(2, new Object[][] { new Object[] {}, new Object[] {} });
     }
