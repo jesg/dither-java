@@ -48,6 +48,16 @@ import java.util.concurrent.Executors;
  * For all methods, the coverage strength {@code t} between 2 and the number of parameters,
  * inclusive. Each parameter must have at least two values. All methods throw
  * {@link IllegalArgumentException} if these conditions are not satisfied.
+ *
+ * @see Y. Lei, R. Kacker, D. R. Kuhn, V. Okun and J. Lawrence,
+ *      "IPOG: A General Strategy for T-Way Software Testing," 14th Annual IEEE International
+ *      Conference and Workshops on the Engineering of Computer-Based Systems (ECBS'07), Tucson, AZ,
+ *      2007, pp. 549-556. doi: 10.1109/ECBS.2007.47
+ *
+ * @see D. M. Cohen, S. R. Dalal, M. L. Fredman and G. C. Patton,
+ *      "The AETG system: an approach to testing based on combinatorial design," in IEEE
+ *      Transactions on Software Engineering, vol. 23, no. 7, pp. 437-444, Jul 1997. doi:
+ *      10.1109/32.605761
  */
 public class Dither {
 
