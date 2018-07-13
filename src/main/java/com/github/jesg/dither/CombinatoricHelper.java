@@ -21,7 +21,6 @@ package com.github.jesg.dither;
  */
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 class CombinatoricHelper {
@@ -114,30 +113,5 @@ class CombinatoricHelper {
                 i--;
             }
         }
-    }
-
-    private static int[][] _product(final int left, final int right) {
-        final int[][] result = new int[left * right][];
-        int k = 0;
-        for (int i = 0; i < left; i++) {
-            for (int j = 0; j < right; j++) {
-                result[k] = new int[] { i, j };
-                k++;
-            }
-        }
-        return result;
-    }
-
-    private static int[][] _product(final int[][] left, final int right) {
-        final int[][] result = new int[left.length * right][];
-        int k = 0;
-        for (int i = 0; i < left.length; i++) {
-            for (int j = 0; j < right; j++) {
-                result[k] = Arrays.copyOf(left[i], left[i].length + 1);
-                result[k][left[i].length] = j;
-                k++;
-            }
-        }
-        return result;
     }
 }
