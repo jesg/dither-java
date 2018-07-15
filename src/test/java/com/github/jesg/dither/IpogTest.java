@@ -37,17 +37,17 @@ public class IpogTest {
     public void setUp() throws Exception {
     }
 
-    @Test(expected = DitherError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void tMustBeGreaterThan2() {
         Dither.ipog(0, new Object[][] {});
     }
 
-    @Test(expected = DitherError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void tMustBeGreaterThanParamLength() {
         Dither.ipog(3, new Object[][] { new Object[] {} });
     }
 
-    @Test(expected = DitherError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void paramsLengthMustBeGreaterThan2() {
         Dither.ipog(new Object[][] { new Object[] {}, new Object[] {} });
     }
@@ -115,6 +115,7 @@ public class IpogTest {
             actuals.add(Arrays.asList(result));
         }
 
+        @SuppressWarnings("unchecked")
         List<List<Integer>> expected = Arrays.asList(
                 Arrays.asList(1, 0, 0),
                 Arrays.asList(1, 1, 0),
@@ -129,7 +130,7 @@ public class IpogTest {
                 Arrays.asList(0, 1, 3),
                 Arrays.asList(1, 1, 3));
 
-        for(List expectedResult : expected) {
+        for(List<Integer> expectedResult : expected) {
             assertTrue("expected " + expectedResult, actuals.contains(expectedResult));
         }
     }
